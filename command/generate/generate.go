@@ -5,7 +5,6 @@ import (
 	"github.com/tsinghua-cel/strategy-gen/command"
 	"github.com/tsinghua-cel/strategy-gen/command/generate/config"
 	"github.com/tsinghua-cel/strategy-gen/command/generate/export"
-	"github.com/tsinghua-cel/strategy-gen/types"
 )
 
 func GetCommand() *cobra.Command {
@@ -28,6 +27,20 @@ func setFlags(cmd *cobra.Command) {
 		configFlag,
 		"",
 		"the path to the CLI config. Supports .json and .yml",
+	)
+
+	cmd.Flags().StringVar(
+		&params.outputFile,
+		"output",
+		"strategy.json",
+		"the output file",
+	)
+
+	cmd.Flags().IntVar(
+		&params.generateMode,
+		"mode",
+		0,
+		"the mode to generate strategy param, 0: default, 1:random",
 	)
 
 	cmd.Flags().IntVar(
@@ -119,22 +132,7 @@ func runCommand(cmd *cobra.Command, _ []string) {
 }
 
 func runGenerate(conf *config.Config) error {
-	outputname := "strategy.json"
-	strategy := types.Strategy{}
-	valEndIndex := conf.ValidatorCount - 1
-	validators := types.GetValidatorStrategy(0, valEndIndex, conf.StartSlot, conf.EndSlot)
-	//slotStrategys := make([]types.SlotStrategy, 0)
-	//for slot := conf.StartSlot; slot <= conf.EndSlot; slot++ {
-	//	attIdx := rand.Intn(len(attestActions))
-	//	bkIdx1 := rand.Intn(len(blockActions) - 1)
-	//	bkIdx2 := bkIdx1 + rand.Intn(len(blockActions)-bkIdx1-1) + 1
-	//	strategy := getSlotStrategy(fmt.Sprintf("%d", slot), attestActions[attIdx], blockActions[bkIdx1], blockActions[bkIdx2])
-	//	slotStrategys = append(slotStrategys, strategy)
-	//}
-	//strategy.Slots = slotStrategys
-
-	strategy.Validators = validators
-	strategy.ToFile(outputname)
-
-	return nil
+	outputname := params.outputFile
+	strategy := config.ConfigToStrategy(params.generateMode, *conf)
+	return strategy.ToFile(outputname)
 }

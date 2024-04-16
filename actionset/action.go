@@ -1,6 +1,9 @@
 package actionset
 
-import "strings"
+import (
+	"encoding/json"
+	"strings"
+)
 
 type AType int
 
@@ -19,6 +22,59 @@ type ActionConfig struct {
 	MaxRandomValue      int    `json:"max_random_value" yaml:"max_random_value"`
 }
 
+// implement ActionConfig json.Marshaler and yaml.Marshaler
+func (ac ActionConfig) MarshalJSON() ([]byte, error) {
+	type simpleConf struct {
+		Name string `json:"name"`
+	}
+	type fullConf struct {
+		Name                string `json:"name" yaml:"name"`
+		Random              bool   `json:"random" yaml:"random"`
+		ParamCount          int    `json:"param_count" yaml:"param_count"`
+		DefaultParamValue   int    `json:"default_param_value" yaml:"default_param_value"`
+		MinRandomParamValue int    `json:"min_random_param_value" yaml:"min_random_param_value"`
+		MaxRandomValue      int    `json:"max_random_value" yaml:"max_random_value"`
+	}
+	if ac.ParamCount == 0 {
+		return json.MarshalIndent(simpleConf{Name: ac.Name}, "", "  ")
+	} else {
+		return json.MarshalIndent(fullConf{
+			Name:                ac.Name,
+			Random:              ac.Random,
+			ParamCount:          ac.ParamCount,
+			DefaultParamValue:   ac.DefaultParamValue,
+			MinRandomParamValue: ac.MinRandomParamValue,
+			MaxRandomValue:      ac.MaxRandomValue,
+		}, "", "  ")
+	}
+}
+
+func (ac ActionConfig) MarshalYAML() (interface{}, error) {
+	type simpleConf struct {
+		Name string `json:"name"`
+	}
+	type fullConf struct {
+		Name                string `json:"name" yaml:"name"`
+		Random              bool   `json:"random" yaml:"random"`
+		ParamCount          int    `json:"param_count" yaml:"param_count"`
+		DefaultParamValue   int    `json:"default_param_value" yaml:"default_param_value"`
+		MinRandomParamValue int    `json:"min_random_param_value" yaml:"min_random_param_value"`
+		MaxRandomValue      int    `json:"max_random_value" yaml:"max_random_value"`
+	}
+	if ac.ParamCount == 0 {
+		return simpleConf{Name: ac.Name}, nil
+	} else {
+		return fullConf{
+			Name:                ac.Name,
+			Random:              ac.Random,
+			ParamCount:          ac.ParamCount,
+			DefaultParamValue:   ac.DefaultParamValue,
+			MinRandomParamValue: ac.MinRandomParamValue,
+			MaxRandomValue:      ac.MaxRandomValue,
+		}, nil
+	}
+}
+
 type Action interface {
 	Name() string
 	MaxParam() int
@@ -32,25 +88,25 @@ type Action interface {
 }
 
 var anyAction = []Action{
-	defaultNullAction,
-	defaultReturnAction,
-	defaultContinueAction,
-	defaultAbortAction,
-	defaultSkipAction,
-	defaultExitAction,
-	defaultDelayWithSecondAction,
-	defaultDelayToNextSlotAction,
-	defaultDelayToAfterNextSlotAction,
-	defaultDelayToNextNEpochStartAction,
-	defaultDelayToNextNEpochEndAction,
-	defaultDelayToNextNEpochHalfAction,
-	defaultDelayToEpochEndAction,
-	defaultDelayHalfEpochAction,
+	NullAction{},
+	ReturnAction{},
+	ContinueAction{},
+	AbortAction{},
+	SkipAction{},
+	ExitAction{},
+	delayWithSecondAction{},
+	delayToNextSlotAction{},
+	delayToAfterNextSlotAction{},
+	delayToNextNEpochStartAction{},
+	delayToNextNEpochEndAction{},
+	delayToNextNEpochHalfAction{},
+	delayToEpochEndAction{},
+	delayHalfEpochAction{},
 }
 
 var attestAction = []Action{
-	defaultStoreSignedAttestAction,
-	defaultRePackAttestationAction,
+	storeSignedAttestAction{},
+	rePackAttestationAction{},
 }
 
 var blockAction = []Action{}

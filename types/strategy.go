@@ -23,7 +23,7 @@ type Strategy struct {
 }
 
 func (s Strategy) ToFile(name string) error {
-	d, _ := json.Marshal(s)
+	d, _ := json.MarshalIndent(s, "", "  ")
 	return os.WriteFile(name, d, 0644)
 }
 

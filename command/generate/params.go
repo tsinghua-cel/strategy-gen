@@ -21,8 +21,10 @@ var (
 )
 
 type toolParam struct {
-	configPath string
-	rawConfig  *config.Config
+	configPath   string
+	outputFile   string
+	generateMode int
+	rawConfig    *config.Config
 }
 
 var (
