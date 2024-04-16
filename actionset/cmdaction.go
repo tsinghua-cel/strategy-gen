@@ -16,7 +16,7 @@ type baseCmdAction struct {
 }
 
 func (b baseCmdAction) DefaultParam() []interface{} {
-	if b.config.DefaultParamValue > 0 {
+	if b.config.ParamCount > 0 {
 		return []interface{}{b.config.DefaultParamValue}
 	}
 	return []interface{}{}
@@ -36,7 +36,7 @@ func (b baseCmdAction) RandomParam() []interface{} {
 
 func (b baseCmdAction) Desc() string { return "Should be replaced" }
 
-func (b baseCmdAction) Name() string { return "baseCmd" }
+func (b baseCmdAction) Name() string { return b.config.Name }
 
 func (b baseCmdAction) MaxParam() int { return b.config.MaxRandomValue }
 

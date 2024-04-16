@@ -29,7 +29,7 @@ const (
 	DefaultValidatorCount     = 21
 	DefaultStartSlot          = 0
 	DefaultEndSlot            = 10000
-	DefaultEnableBlockPoints  = "BlockDelayForReceiveBlock,BlockBeforeBroadCastBlock"
+	DefaultEnableBlockPoints  = "BlockDelayForReceiveBlock,BlockBeforeBroadCast"
 	DefaultEnableAttPoints    = "AttestBeforeBroadCast"
 	DefaultEnableBlockActions = "null,delayWithSecond,delayToAfterNextSlot,delayToNextNEpochStart,delayToNextNEpochHalf,delayToEpochEnd,return"
 	DefaultEnableAttActions   = "null,delayWithSecond,delayToAfterNextSlot,return"
@@ -37,6 +37,8 @@ const (
 
 // DefaultConfig returns the default server configuration
 func DefaultConfig() *Config {
+	defaultConfigInit()
+
 	conf := &Config{
 		ValidatorCount:     DefaultValidatorCount,
 		StartSlot:          DefaultStartSlot,
@@ -150,10 +152,14 @@ func ConfigToStrategy(mode int, conf Config) types.Strategy {
 			action := randomAction(blockActions)
 			astr := action.Name()
 			if action.GetConfig().ParamCount > 0 {
+				param := []interface{}{}
 				if mode == 1 {
-					astr = fmt.Sprintf("%s:%v", astr, action.RandomParam())
+					param = action.RandomParam()
 				} else {
-					astr = fmt.Sprintf("%s:%v", astr, action.DefaultParam())
+					param = action.DefaultParam()
+				}
+				for _, p := range param {
+					astr = fmt.Sprintf("%s:%v", astr, p)
 				}
 			}
 			strate.Actions[point] = astr
@@ -162,10 +168,14 @@ func ConfigToStrategy(mode int, conf Config) types.Strategy {
 			action := randomAction(attActions)
 			astr := action.Name()
 			if action.GetConfig().ParamCount > 0 {
+				param := []interface{}{}
 				if mode == 1 {
-					astr = fmt.Sprintf("%s:%v", astr, action.RandomParam())
+					param = action.RandomParam()
 				} else {
-					astr = fmt.Sprintf("%s:%v", astr, action.DefaultParam())
+					param = action.DefaultParam()
+				}
+				for _, p := range param {
+					astr = fmt.Sprintf("%s:%v", astr, p)
 				}
 			}
 			strate.Actions[point] = astr

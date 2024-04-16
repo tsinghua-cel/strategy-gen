@@ -6,7 +6,11 @@ var (
 	defaultActionConfigs = make([]actionset.ActionConfig, 0)
 )
 
-func init() {
+func defaultConfigInit() {
+	if len(defaultActionConfigs) > 0 {
+		return
+	}
+
 	defaultActionConfigs = append(defaultActionConfigs, actionset.ActionConfig{
 		Name:                "null",
 		Random:              false,

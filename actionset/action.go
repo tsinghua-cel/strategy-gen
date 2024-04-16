@@ -19,7 +19,7 @@ type ActionConfig struct {
 	ParamCount          int    `json:"param_count" yaml:"param_count"`
 	DefaultParamValue   int    `json:"default_param_value" yaml:"default_param_value"`
 	MinRandomParamValue int    `json:"min_random_param_value" yaml:"min_random_param_value"`
-	MaxRandomValue      int    `json:"max_random_value" yaml:"max_random_value"`
+	MaxRandomValue      int    `json:"max_random_param_value" yaml:"max_random_param_value"`
 }
 
 // implement ActionConfig json.Marshaler and yaml.Marshaler
@@ -33,7 +33,7 @@ func (ac ActionConfig) MarshalJSON() ([]byte, error) {
 		ParamCount          int    `json:"param_count" yaml:"param_count"`
 		DefaultParamValue   int    `json:"default_param_value" yaml:"default_param_value"`
 		MinRandomParamValue int    `json:"min_random_param_value" yaml:"min_random_param_value"`
-		MaxRandomValue      int    `json:"max_random_value" yaml:"max_random_value"`
+		MaxRandomValue      int    `json:"max_random_param_value" yaml:"max_random_param_value"`
 	}
 	if ac.ParamCount == 0 {
 		return json.MarshalIndent(simpleConf{Name: ac.Name}, "", "  ")
@@ -59,7 +59,7 @@ func (ac ActionConfig) MarshalYAML() (interface{}, error) {
 		ParamCount          int    `json:"param_count" yaml:"param_count"`
 		DefaultParamValue   int    `json:"default_param_value" yaml:"default_param_value"`
 		MinRandomParamValue int    `json:"min_random_param_value" yaml:"min_random_param_value"`
-		MaxRandomValue      int    `json:"max_random_value" yaml:"max_random_value"`
+		MaxRandomValue      int    `json:"max_random_param_value" yaml:"max_random_param_value"`
 	}
 	if ac.ParamCount == 0 {
 		return simpleConf{Name: ac.Name}, nil
