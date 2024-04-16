@@ -11,18 +11,14 @@ import (
 
 // Config defines the server configuration params
 type Config struct {
-	ValidatorCount     int          `json:"validator_count" yaml:"validator_count"`
-	StartSlot          int          `json:"start_slot" yaml:"start_slot"`
-	EndSlot            int          `json:"end_slot" yaml:"end_slot"`
-	EnableBlockPoints  string       `json:"enable_block_points" yaml:"enable_block_points"`
-	EnableBlockActions string       `json:"enable_block_actions" yaml:"enable_block_actions"`
-	EnableAttPoints    string       `json:"enable_att_points" yaml:"enable_att_points"`
-	EnableAttActions   string       `json:"enable_att_actions" yaml:"enable_att_actions"`
-	ActionsConfig      ActionConfig `json:"default_actions_config" yaml:"default_actions_config"`
-}
-
-type ActionConfig struct {
-	allAction []actionset.Action
+	ValidatorCount     int                      `json:"validator_count" yaml:"validator_count"`
+	StartSlot          int                      `json:"start_slot" yaml:"start_slot"`
+	EndSlot            int                      `json:"end_slot" yaml:"end_slot"`
+	EnableBlockPoints  string                   `json:"enable_block_points" yaml:"enable_block_points"`
+	EnableBlockActions string                   `json:"enable_block_actions" yaml:"enable_block_actions"`
+	EnableAttPoints    string                   `json:"enable_att_points" yaml:"enable_att_points"`
+	EnableAttActions   string                   `json:"enable_att_actions" yaml:"enable_att_actions"`
+	ActionsConfig      []actionset.ActionConfig `json:"actions_config" yaml:"actions_config"`
 }
 
 const (
@@ -35,13 +31,9 @@ const (
 	DefaultEnableAttActions   = "null,delayWithSecond,delayToAfterNextSlot,return"
 )
 
-var DefaultActionsConfig = ActionConfig{
-	allAction: actionset.GetAllActionSet(),
-}
-
 // DefaultConfig returns the default server configuration
 func DefaultConfig() *Config {
-	return &Config{
+	conf := &Config{
 		ValidatorCount:     DefaultValidatorCount,
 		StartSlot:          DefaultStartSlot,
 		EndSlot:            DefaultEndSlot,
@@ -49,7 +41,13 @@ func DefaultConfig() *Config {
 		EnableBlockActions: DefaultEnableBlockActions,
 		EnableAttPoints:    DefaultEnableAttPoints,
 		EnableAttActions:   DefaultEnableAttActions,
+		ActionsConfig:      make([]actionset.ActionConfig, 0),
 	}
+	allaction := actionset.GetAllActionSet()
+	for _, action := range allaction {
+		conf.ActionsConfig = append(conf.ActionsConfig, action.GetConfig())
+	}
+	return conf
 }
 
 // ReadConfigFile reads the config file from the specified path, builds a Config object

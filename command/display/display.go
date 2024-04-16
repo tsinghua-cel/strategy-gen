@@ -26,8 +26,8 @@ func runCommand(cmd *cobra.Command, _ []string) {
 			AttPoints:   pointset.AttestPointSet,
 		},
 		ActionResult: ActionResult{
-			BlockActionList: actionset.GetBlockActionSet(),
-			AttActionList:   actionset.GetAttestActionSet(),
+			BlockActionList: actionset.GetBlockActionNameList(),
+			AttActionList:   actionset.GetAttestActionNameList(),
 		},
 	})
 }
