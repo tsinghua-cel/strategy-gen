@@ -6,6 +6,7 @@ import (
 	"github.com/tsinghua-cel/strategy-gen/command/display"
 	"github.com/tsinghua-cel/strategy-gen/command/generate"
 	"github.com/tsinghua-cel/strategy-gen/command/helper"
+	"github.com/tsinghua-cel/strategy-gen/command/update"
 	"github.com/tsinghua-cel/strategy-gen/command/version"
 	"os"
 )
@@ -31,6 +32,7 @@ func NewRootCommand() *RootCommand {
 func (rc *RootCommand) registerSubCommands() {
 	rc.baseCmd.AddCommand(
 		generate.GetCommand(),
+		update.GetCommand(),
 		display.GetCommand(),
 		version.GetCommand(),
 	)
