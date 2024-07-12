@@ -16,6 +16,8 @@ func AttestStrategyForEpoch0(actions map[string]string) {
 
 func BlockStrategyForEpoch1(actions map[string]string) {
 	actions["BlockBeforeSign"] = "packPooledAttest"
+	// block delay to next epoch-end slot
+	actions["BlockBeforeBroadCast"] = fmt.Sprintf("delayToNextNEpochEnd:%d", 1)
 }
 
 func AttestStrategyForEpoch1(actions map[string]string) {
