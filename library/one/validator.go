@@ -1,4 +1,4 @@
-package library
+package one
 
 import (
 	"github.com/tsinghua-cel/strategy-gen/types"

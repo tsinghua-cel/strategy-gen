@@ -38,3 +38,8 @@ func GetValidatorStrategy(startIndex, endIndex int, startSlot, endSlot int) []Va
 	}
 	return res
 }
+
+type LibraryParams struct {
+	Attacker          string
+	MaxValidatorIndex int
+}
