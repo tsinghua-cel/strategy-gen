@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tsinghua-cel/strategy-gen/library"
 	"github.com/tsinghua-cel/strategy-gen/types"
+	"os"
 )
 
 func GetCommand() *cobra.Command {
@@ -14,15 +15,39 @@ func GetCommand() *cobra.Command {
 		Short: "Run a library strategy generator.",
 		Run:   runCommand,
 	}
+
 	log.SetFormatter(&log.TextFormatter{
 		DisableColors: true,
 		FullTimestamp: true,
 	})
 	setFlags(runtimeCmd)
+
 	return runtimeCmd
 }
 
+func setlog(path string) func() {
+	if path == "" {
+		return nil
+	}
+	// logrus log to file
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.SetOutput(file)
+	return func() {
+		file.Close()
+	}
+}
+
 func setFlags(cmd *cobra.Command) {
+
+	cmd.Flags().StringVar(
+		&params.logPath,
+		logFlag,
+		"",
+		"the log path",
+	)
 
 	cmd.Flags().IntVar(
 		&params.maxValidatorIndex,
@@ -54,6 +79,13 @@ func setFlags(cmd *cobra.Command) {
 }
 
 func runCommand(cmd *cobra.Command, _ []string) {
+	closeFunc := setlog(params.logPath)
+	defer func() {
+		if closeFunc != nil {
+			closeFunc()
+		}
+	}()
+
 	library.Init()
 
 	if params.listLibrary {
