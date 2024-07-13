@@ -38,6 +38,10 @@ func (o *Two) Run(params types.LibraryParams) {
 				log.WithField("error", err).Error("failed to get slot")
 				continue
 			}
+			log.WithFields(log.Fields{
+				"slot":      slot,
+				"lastEpoch": latestEpoch,
+			}).Info("get slot")
 			epoch := slotTool.SlotToEpoch(int64(slot))
 			// generate new strategy at the end of last epoch.
 			if int64(slot) < slotTool.EpochEnd(epoch) {
