@@ -1,4 +1,4 @@
-package two
+package three
 
 import (
 	log "github.com/sirupsen/logrus"
@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
-type Two struct {
+type Three struct {
 }
 
-func (o *Two) Description() string {
+func (o *Three) Description() string {
 	//	desc_cn := `
 	//假设当前epoch = 0, 那么 在epoch=1 时，所有做恶验证者的投票不广播;
 	//在 epoch=2 时，所有做恶验证者的投票不广播;
@@ -25,7 +25,7 @@ func (o *Two) Description() string {
 	return desc_eng
 }
 
-func (o *Two) Run(params types.LibraryParams) {
+func (o *Three) Run(params types.LibraryParams) {
 	log.WithField("name", "three").Info("start to run strategy")
 	var latestEpoch int64 = -1
 	ticker := time.NewTicker(time.Second * 3)

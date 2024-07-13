@@ -17,7 +17,7 @@ func (o *One) Description() string {
 	//delay策略：blockdelay 到最后一个恶意节点出块的下一个slot；
 	//恶意节点的投票者 开始做恶，对投票进行delay，执行的策略和blockdelay一样。`
 	desc_eng := `	Check the order of malicious nodes in the next epoch one epoch in advance;
-	If there are more than two malicious nodes in a row, start the strategy;
+	If there are more than three malicious nodes in a row, start the strategy;
 	Delay strategy: blockdelay to the next slot after the last malicious node;
 	Malicious nodes' voters start to do evil, delay the voting, and execute the
 	same strategy as blockdelay.`

@@ -2,7 +2,7 @@ package library
 
 import (
 	"github.com/tsinghua-cel/strategy-gen/library/one"
-	"github.com/tsinghua-cel/strategy-gen/library/two"
+	"github.com/tsinghua-cel/strategy-gen/library/three"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"sync"
 )
@@ -18,7 +18,7 @@ var (
 
 func Init() {
 	allStrategies.Store("one", &one.One{})
-	allStrategies.Store("two", &two.Two{})
+	allStrategies.Store("three", &three.Three{})
 }
 
 func GetStrategy(name string) (Strategy, bool) {
