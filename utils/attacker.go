@@ -24,7 +24,24 @@ func UpdateStrategy(url string, strategy types.Strategy) error {
 	return nil
 }
 
-func GetSlot(url string) (int, error) {
+func GetCurSlot(url string) (int, error) {
+	res, err := http.Get(fmt.Sprintf("http://%s/v1/curslot", url))
+	if err != nil {
+		return 0, err
+	}
+	if res.StatusCode != 200 {
+		return 0, fmt.Errorf("failed to get slot: %s", res.Status)
+	}
+
+	var slot int
+	err = json.NewDecoder(res.Body).Decode(&slot)
+	if err != nil {
+		return 0, err
+	}
+	return slot, nil
+}
+
+func GetHeadSlot(url string) (int, error) {
 	res, err := http.Get(fmt.Sprintf("http://%s/v1/slot", url))
 	if err != nil {
 		return 0, err

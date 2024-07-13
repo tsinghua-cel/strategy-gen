@@ -32,7 +32,7 @@ func (o *One) Run(params types.LibraryParams) {
 	for {
 		select {
 		case <-ticker.C:
-			slot, err := utils.GetSlot(params.Attacker)
+			slot, err := utils.GetCurSlot(params.Attacker)
 			if err != nil {
 				log.WithField("error", err).Error("failed to get slot")
 				continue
