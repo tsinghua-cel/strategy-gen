@@ -58,9 +58,9 @@ func GenSlotStrategy(latestHackDutySlot int, epoch int64) []types.SlotStrategy {
 			strategy.Actions["AttestBeforeSign"] = fmt.Sprintf("return")
 
 			strategy.Actions["BlockBeforeSign"] = "packPooledAttest"
-			strategy.Actions["BlockDelayForReceiveBlock"] = fmt.Sprintf("delayToNextNEpochStart:%d", 2)
+			strategy.Actions["BlockDelayForReceiveBlock"] = fmt.Sprintf("delayHalfEpoch")
 			// block delay to next epoch-end slot
-			//strategy.Actions["BlockBeforeBroadCast"] = fmt.Sprintf("delayToNextNEpochStart:%d", 1)
+			strategy.Actions["BlockBeforeBroadCast"] = fmt.Sprintf("delayToNextNEpochStart:%d", 2)
 
 			strategys = append(strategys, strategy)
 		}
