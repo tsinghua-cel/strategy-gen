@@ -5,25 +5,6 @@ import (
 	"github.com/tsinghua-cel/strategy-gen/types"
 )
 
-func BlockStrategyForEpoch0(actions map[string]string) {
-	// nothing to do
-}
-
-func AttestStrategyForEpoch0(actions map[string]string) {
-	actions["AttestBeforeSign"] = fmt.Sprintf("return")
-}
-
-func BlockStrategyForEpoch2(actions map[string]string) {
-	actions["BlockBeforeSign"] = "packPooledAttest"
-	// block delay to next epoch-end slot
-	actions["BlockBeforeBroadCast"] = fmt.Sprintf("delayToNextNEpochStart:%d", 2)
-}
-
-func AttestStrategyForEpoch2(actions map[string]string) {
-	actions["AttestAfterSign"] = fmt.Sprintf("addAttestToPool")
-	actions["AttestBeforeBroadCast"] = fmt.Sprintf("return")
-}
-
 func GenSlotStrategy(latestHackDutySlot int, epoch int64) []types.SlotStrategy {
 	strategys := make([]types.SlotStrategy, 0)
 	switch epoch % 3 {
@@ -33,7 +14,7 @@ func GenSlotStrategy(latestHackDutySlot int, epoch int64) []types.SlotStrategy {
 			Level:   0,
 			Actions: make(map[string]string),
 		}
-		strategy.Actions["BlockBeforePropose"] = "return"
+		strategy.Actions["BlockBeforeSign"] = "return"
 		strategy.Actions["AttestBeforeSign"] = fmt.Sprintf("return")
 		strategys = append(strategys, strategy)
 
@@ -44,7 +25,7 @@ func GenSlotStrategy(latestHackDutySlot int, epoch int64) []types.SlotStrategy {
 				Level:   0,
 				Actions: make(map[string]string),
 			}
-			strategy.Actions["BlockBeforePropose"] = "return"
+			strategy.Actions["BlockBeforeSign"] = "return"
 			strategy.Actions["AttestAfterSign"] = fmt.Sprintf("addAttestToPool")
 			strategy.Actions["AttestBeforeBroadCast"] = fmt.Sprintf("return")
 			strategys = append(strategys, strategy)
