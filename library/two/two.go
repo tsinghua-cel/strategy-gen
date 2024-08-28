@@ -26,7 +26,7 @@ func (o *Two) Description() string {
 }
 
 func (o *Two) Run(params types.LibraryParams) {
-	log.WithField("name", "three").Info("start to run strategy")
+	log.WithField("name", "two").Info("start to run strategy")
 	var latestEpoch int64 = -1
 	ticker := time.NewTicker(time.Second * 3)
 	slotTool := utils.SlotTool{SlotsPerEpoch: 32}

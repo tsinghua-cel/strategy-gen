@@ -15,13 +15,13 @@ func (o *Three) Description() string {
 	//	desc_cn := `
 	//假设当前epoch = 0, 那么 在epoch=1 时，所有做恶验证者的投票不广播;
 	//在 epoch=2 时，所有做恶验证者的投票不广播;
-	//在 epoch=2的 最后一个做恶节点出块时，打包之前的所有做恶验证者的投票，并在 epoch=3的最后一个slot广播区块.
+	//在 epoch=2的 最后一个做恶节点出块时，打包之前的所有做恶验证者的投票，并在 epoch=4的最后一个slot广播区块.
 	//`
 	desc_eng := `	Assume that the current epoch = 0, then in epoch = 1, the votes of all 
 	malicious validators are not broadcast;
 	In epoch = 2, the votes of all malicious validators are not broadcast;
 	When the last malicious node in epoch = 2 produces a block, package the votes of
-	all malicious validators before and broadcast the block at the last slot of epoch = 3.`
+	all malicious validators before and broadcast the block at the last slot of epoch = 4.`
 	return desc_eng
 }
 
