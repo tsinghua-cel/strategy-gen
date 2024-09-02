@@ -5,27 +5,29 @@ import (
 	"strconv"
 )
 
-func CheckDuties(maxValidatorIndex int, duties []utils.ProposerDuty) ([]utils.ProposerDuty, bool) {
-	maxLength := 0
-	maxIndex := 0
-	length := 0
-	index := 0
-	for i, duty := range duties {
+func CheckDuties(maxValidatorIndex int, duties []utils.ProposerDuty) ([]interface{}, bool) {
+	result := make([]interface{}, 0)
+
+	tmpsub := make([]utils.ProposerDuty, 0)
+	for _, duty := range duties {
 		valIdx, _ := strconv.Atoi(duty.ValidatorIndex)
 
 		if valIdx <= maxValidatorIndex {
-			length++
-			if length > maxLength {
-				maxLength = length
-				maxIndex = index
-			}
+			tmpsub = append(tmpsub, duty)
 		} else {
-			length = 0
-			index = i + 1
+			if len(tmpsub) > 2 {
+				result = append(result, tmpsub)
+			}
+			tmpsub = make([]utils.ProposerDuty, 0)
 		}
 	}
-	if maxLength > 2 {
-		return duties[maxIndex : maxIndex+maxLength], true
+	if len(tmpsub) > 2 {
+		result = append(result, tmpsub)
 	}
+
+	if len(result) > 0 {
+		return result, true
+	}
+
 	return nil, false
 }

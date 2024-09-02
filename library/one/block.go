@@ -24,22 +24,27 @@ func AttestStrategy(cur, end int, actions map[string]string) {
 	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", (end+1-cur)*12)
 }
 
-func GenSlotStrategy(duties []utils.ProposerDuty) []types.SlotStrategy {
-	//begin, _ := strconv.Atoi(duties[0].Slot)
-	end, _ := strconv.Atoi(duties[len(duties)-1].Slot)
+func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
 	strategys := make([]types.SlotStrategy, 0)
-	for i := 0; i < len(duties); i++ {
-		slot, _ := strconv.Atoi(duties[i].Slot)
-		//idx, _ := strconv.Atoi(duties[i].ValidatorIndex)
-		strategy := types.SlotStrategy{
-			Slot:    duties[i].Slot,
-			Level:   0,
-			Actions: make(map[string]string),
+	for _, subduties := range allHacks {
+		duties := subduties.([]utils.ProposerDuty)
+		//begin, _ := strconv.Atoi(duties[0].Slot)
+		end, _ := strconv.Atoi(duties[len(duties)-1].Slot)
+
+		for i := 0; i < len(duties); i++ {
+			slot, _ := strconv.Atoi(duties[i].Slot)
+			//idx, _ := strconv.Atoi(duties[i].ValidatorIndex)
+			strategy := types.SlotStrategy{
+				Slot:    duties[i].Slot,
+				Level:   0,
+				Actions: make(map[string]string),
+			}
+			BlockStrategy(slot, end, strategy.Actions)
+			AttestStrategy(slot, end, strategy.Actions)
+			strategys = append(strategys, strategy)
 		}
-		BlockStrategy(slot, end, strategy.Actions)
-		AttestStrategy(slot, end, strategy.Actions)
-		strategys = append(strategys, strategy)
 	}
+
 	return strategys
 
 }
