@@ -1,6 +1,7 @@
 package library
 
 import (
+	"github.com/tsinghua-cel/strategy-gen/library/five"
 	"github.com/tsinghua-cel/strategy-gen/library/four"
 	"github.com/tsinghua-cel/strategy-gen/library/one"
 	"github.com/tsinghua-cel/strategy-gen/library/three"
@@ -23,6 +24,7 @@ func Init() {
 	allStrategies.Store("two", &two.Two{})
 	allStrategies.Store("three", &three.Three{})
 	allStrategies.Store("four", &four.Four{})
+	allStrategies.Store("five", &five.Five{})
 }
 
 func GetStrategy(name string) (Strategy, bool) {

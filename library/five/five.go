@@ -1,4 +1,4 @@
-package one
+package five
 
 import (
 	log "github.com/sirupsen/logrus"
@@ -7,25 +7,20 @@ import (
 	"time"
 )
 
-type One struct {
+type Five struct {
 }
 
-func (o *One) Description() string {
+func (o *Five) Description() string {
 	//	desc_cn := `
 	//提前一个epoch 查看下一个epoch的恶意节点出块顺序；
-	//如果有连续两个以上恶意节点出块，开始进行策略；
-	//delay策略：blockdelay 到其中最后一个恶意节点出块的下一个slot；
-	//恶意节点的投票者 开始做恶，对投票进行delay，执行的策略和blockdelay一样。`
-	desc_eng := `	Check the order of malicious nodes in the next epoch one epoch in advance;
-	If there are more than three malicious nodes in a row, start the strategy;
-	Delay strategy: blockdelay to the next slot after the last malicious node;
-	Malicious nodes' voters start to do evil, delay the voting, and execute the
-	same strategy as blockdelay.`
+	//两个恶意节点之间穿插了一个诚实节点的块，让第二恶意节点的区块的parent，指向上一个恶意节点的slot.
+	//delay 策略：第一个恶意节点的区块，广播delay 1个slot;
+	desc_eng := `	Check the order of malicious nodes in the next epoch one epoch in advance;`
 	return desc_eng
 }
 
-func (o *One) Run(params types.LibraryParams) {
-	log.WithField("name", "one").Info("start to run strategy")
+func (o *Five) Run(params types.LibraryParams) {
+	log.WithField("name", "five").Info("start to run strategy")
 	var latestEpoch int64
 	ticker := time.NewTicker(time.Second * 3)
 	slotTool := utils.SlotTool{SlotsPerEpoch: 32}
@@ -57,7 +52,6 @@ func (o *One) Run(params types.LibraryParams) {
 			}
 			if hackDuties, happen := CheckDuties(params.MaxValidatorIndex, duties); happen {
 				strategy := types.Strategy{}
-				strategy.Validators = ValidatorStrategy(hackDuties)
 				strategy.Slots = GenSlotStrategy(hackDuties)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
 					log.WithField("error", err).Error("failed to update strategy")
