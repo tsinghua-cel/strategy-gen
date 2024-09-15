@@ -7,8 +7,7 @@ import (
 	"time"
 )
 
-type Instance struct {
-}
+type Instance struct{}
 
 func (o *Instance) Run(params types.LibraryParams) {
 	log.WithField("name", o.Name()).Info("start to run strategy")
@@ -28,7 +27,7 @@ func (o *Instance) Run(params types.LibraryParams) {
 				continue
 			}
 			if int64(slot) < slotTool.EpochEnd(epoch) {
-				//continue
+				continue
 			}
 			latestEpoch = epoch
 			// get next epoch duties

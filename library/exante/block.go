@@ -28,7 +28,7 @@ func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
 			slot, _ := strconv.Atoi(duties[i].Slot)
 			strategy := types.SlotStrategy{
 				Slot:    duties[i].Slot,
-				Level:   0,
+				Level:   1,
 				Actions: make(map[string]string),
 			}
 			BlockStrategy(slot, end, strategy.Actions)

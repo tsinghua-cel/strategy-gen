@@ -37,7 +37,7 @@ func (o *Instance) Run(params types.LibraryParams) {
 				continue
 			}
 			if int64(slot) < slotTool.EpochEnd(epoch) {
-				//continue
+				continue
 			}
 			latestEpoch = epoch
 			// get next epoch duties
