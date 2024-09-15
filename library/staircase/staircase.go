@@ -51,23 +51,41 @@ func (o *Instance) Run(params types.LibraryParams) {
 				nextEpoch := epoch + 1
 				cas := 0
 
-				duties, err := utils.GetEpochDuties(params.Attacker, nextEpoch)
-				pduties, err := utils.GetEpochDuties(params.Attacker, epoch-1)
-				cduties, err := utils.GetEpochDuties(params.Attacker, epoch)
+				nextDuties, err := utils.GetEpochDuties(params.Attacker, nextEpoch)
 				if err != nil {
 					log.WithFields(log.Fields{
 						"error": err,
-						"epoch": epoch + 1,
+						"epoch": nextEpoch,
+					}).Error("failed to get duties")
+					latestEpoch = epoch - 1
+					continue
+				}
+				preDuties, err := utils.GetEpochDuties(params.Attacker, epoch-1)
+				if err != nil {
+					log.WithFields(log.Fields{
+						"error": err,
+						"epoch": epoch - 1,
+					}).Error("failed to get duties")
+					latestEpoch = epoch - 1
+					continue
+				}
+				curDuties, err := utils.GetEpochDuties(params.Attacker, epoch)
+				if err != nil {
+					log.WithFields(log.Fields{
+						"error": err,
+						"epoch": epoch,
 					}).Error("failed to get duties")
 					latestEpoch = epoch - 1
 					continue
 				}
 				strategy := types.Strategy{}
 				strategy.Validators = ValidatorStrategy(params.MaxValidatorIndex, nextEpoch)
-				if checkFirstByzSlot(pduties, params.MaxValidatorIndex) && checkFirstByzSlot(cduties, params.MaxValidatorIndex) && !checkFirstByzSlot(duties, params.MaxValidatorIndex) {
+				if checkFirstByzSlot(preDuties, params.MaxValidatorIndex) &&
+					checkFirstByzSlot(curDuties, params.MaxValidatorIndex) &&
+					!checkFirstByzSlot(nextDuties, params.MaxValidatorIndex) {
 					cas = 1
 				}
-				strategy.Slots = GenSlotStrategy(getLatestHackerSlot(duties, params.MaxValidatorIndex), nextEpoch, cas)
+				strategy.Slots = GenSlotStrategy(getLatestHackerSlot(nextDuties, params.MaxValidatorIndex), nextEpoch, cas)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
 					log.WithField("error", err).Error("failed to update strategy")
 				} else {
