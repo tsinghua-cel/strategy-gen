@@ -7,10 +7,14 @@ import (
 	"time"
 )
 
-type Five struct {
+type Instance struct {
 }
 
-func (o *Five) Description() string {
+func (o *Instance) Name() string {
+	return "five"
+}
+
+func (o *Instance) Description() string {
 	//	desc_cn := `
 	//提前一个epoch 查看下一个epoch的恶意节点出块顺序；
 	//两个恶意节点之间穿插了一个诚实节点的块，让第二恶意节点的区块的parent，指向上一个恶意节点的slot.
@@ -21,8 +25,8 @@ func (o *Five) Description() string {
 	return desc_eng
 }
 
-func (o *Five) Run(params types.LibraryParams) {
-	log.WithField("name", "five").Info("start to run strategy")
+func (o *Instance) Run(params types.LibraryParams) {
+	log.WithField("name", o.Name()).Info("start to run strategy")
 	var latestEpoch int64
 	ticker := time.NewTicker(time.Second * 3)
 	slotTool := utils.SlotTool{SlotsPerEpoch: 32}

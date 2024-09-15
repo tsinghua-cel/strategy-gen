@@ -8,10 +8,14 @@ import (
 	"time"
 )
 
-type Four struct {
+type Instance struct {
 }
 
-func (o *Four) Description() string {
+func (o *Instance) Name() string {
+	return "four"
+}
+
+func (o *Instance) Description() string {
 	//	desc_cn := `
 	//假设当前epoch = 0, 那么 在epoch=1 时，所有做恶验证者的投票不广播;
 	//在 epoch=2 时，所有做恶验证者的投票不广播;
@@ -25,8 +29,8 @@ func (o *Four) Description() string {
 	return desc_eng
 }
 
-func (o *Four) Run(params types.LibraryParams) {
-	log.WithField("name", "three").Info("start to run strategy")
+func (o *Instance) Run(params types.LibraryParams) {
+	log.WithField("name", o.Name()).Info("start to run strategy")
 	var latestEpoch int64 = -1
 	ticker := time.NewTicker(time.Second * 3)
 	slotTool := utils.SlotTool{SlotsPerEpoch: 32}

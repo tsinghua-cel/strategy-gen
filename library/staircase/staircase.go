@@ -1,4 +1,4 @@
-package two
+package staircase
 
 import (
 	log "github.com/sirupsen/logrus"
@@ -12,20 +12,11 @@ type Instance struct {
 }
 
 func (o *Instance) Name() string {
-	return "two"
+	return "staircase"
 }
 
 func (o *Instance) Description() string {
-	//	desc_cn := `
-	//假设当前epoch = 0, 那么 在epoch=1 时，所有做恶验证者的投票不广播;
-	//在 epoch=2 时，所有做恶验证者的投票不广播;
-	//在 epoch=2的 最后一个做恶节点出块时，打包之前的所有做恶验证者的投票，并在 epoch=3的最后一个slot广播区块.
-	//`
-	desc_eng := `	Assume that the current epoch = 0, then in epoch = 1, the votes of all 
-	malicious validators are not broadcast;
-	In epoch = 2, the votes of all malicious validators are not broadcast;
-	When the last malicious node in epoch = 2 produces a block, package the votes of
-	all malicious validators before and broadcast the block at the last slot of epoch = 3.`
+	desc_eng := `Staircase attack`
 	return desc_eng
 }
 
@@ -58,8 +49,11 @@ func (o *Instance) Run(params types.LibraryParams) {
 
 			{
 				nextEpoch := epoch + 1
+				cas := 0
 
 				duties, err := utils.GetEpochDuties(params.Attacker, nextEpoch)
+				pduties, err := utils.GetEpochDuties(params.Attacker, epoch-1)
+				cduties, err := utils.GetEpochDuties(params.Attacker, epoch)
 				if err != nil {
 					log.WithFields(log.Fields{
 						"error": err,
@@ -70,7 +64,10 @@ func (o *Instance) Run(params types.LibraryParams) {
 				}
 				strategy := types.Strategy{}
 				strategy.Validators = ValidatorStrategy(params.MaxValidatorIndex, nextEpoch)
-				strategy.Slots = GenSlotStrategy(getLatestHackerSlot(duties, params.MaxValidatorIndex), nextEpoch)
+				if checkFirstByzSlot(pduties, params.MaxValidatorIndex) && checkFirstByzSlot(cduties, params.MaxValidatorIndex) && !checkFirstByzSlot(duties, params.MaxValidatorIndex) {
+					cas = 1
+				}
+				strategy.Slots = GenSlotStrategy(getLatestHackerSlot(duties, params.MaxValidatorIndex), nextEpoch, cas)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
 					log.WithField("error", err).Error("failed to update strategy")
 				} else {
@@ -98,4 +95,12 @@ func getLatestHackerSlot(duties []utils.ProposerDuty, maxValidatorIndex int) int
 	}
 	return latest
 
+}
+
+func checkFirstByzSlot(duties []utils.ProposerDuty, maxValidatorIndex int) bool {
+	firstproposerindex, _ := strconv.Atoi(duties[0].ValidatorIndex)
+	if firstproposerindex > maxValidatorIndex {
+		return false
+	}
+	return true
 }

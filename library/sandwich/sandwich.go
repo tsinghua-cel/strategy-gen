@@ -1,4 +1,4 @@
-package one
+package sandwich
 
 import (
 	log "github.com/sirupsen/logrus"
@@ -7,24 +7,7 @@ import (
 	"time"
 )
 
-type Instance struct{}
-
-func (o *Instance) Name() string {
-	return "one"
-}
-
-func (o *Instance) Description() string {
-	//	desc_cn := `
-	//提前一个epoch 查看下一个epoch的恶意节点出块顺序；
-	//如果有连续两个以上恶意节点出块，开始进行策略；
-	//delay策略：blockdelay 到其中最后一个恶意节点出块的下一个slot；
-	//恶意节点的投票者 开始做恶，对投票进行delay，执行的策略和blockdelay一样。`
-	desc_eng := `	Check the order of malicious nodes in the next epoch one epoch in advance;
-	If there are more than three malicious nodes in a row, start the strategy;
-	Delay strategy: blockdelay to the next slot after the last malicious node;
-	Malicious nodes' voters start to do evil, delay the voting, and execute the
-	same strategy as blockdelay.`
-	return desc_eng
+type Instance struct {
 }
 
 func (o *Instance) Run(params types.LibraryParams) {
@@ -60,7 +43,6 @@ func (o *Instance) Run(params types.LibraryParams) {
 			}
 			if hackDuties, happen := CheckDuties(params.MaxValidatorIndex, duties); happen {
 				strategy := types.Strategy{}
-				strategy.Validators = ValidatorStrategy(hackDuties)
 				strategy.Slots = GenSlotStrategy(hackDuties)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
 					log.WithField("error", err).Error("failed to update strategy")
@@ -73,4 +55,13 @@ func (o *Instance) Run(params types.LibraryParams) {
 			}
 		}
 	}
+}
+
+func (o *Instance) Name() string {
+	return "sandwich"
+}
+
+func (o *Instance) Description() string {
+	desc_eng := `Sandwich reorg attack.`
+	return desc_eng
 }

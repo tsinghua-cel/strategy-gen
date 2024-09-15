@@ -1,16 +1,22 @@
 package library
 
 import (
+	"github.com/tsinghua-cel/strategy-gen/library/exante"
 	"github.com/tsinghua-cel/strategy-gen/library/five"
 	"github.com/tsinghua-cel/strategy-gen/library/four"
 	"github.com/tsinghua-cel/strategy-gen/library/one"
+	"github.com/tsinghua-cel/strategy-gen/library/sandwich"
+	"github.com/tsinghua-cel/strategy-gen/library/staircase"
 	"github.com/tsinghua-cel/strategy-gen/library/three"
 	"github.com/tsinghua-cel/strategy-gen/library/two"
+	"github.com/tsinghua-cel/strategy-gen/library/unrealized"
+	"github.com/tsinghua-cel/strategy-gen/library/withholding"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"sync"
 )
 
 type Strategy interface {
+	Name() string
 	Run(param types.LibraryParams)
 	Description() string
 }
@@ -20,11 +26,20 @@ var (
 )
 
 func Init() {
-	allStrategies.Store("one", &one.One{})
-	allStrategies.Store("two", &two.Two{})
-	allStrategies.Store("three", &three.Three{})
-	allStrategies.Store("four", &four.Four{})
-	allStrategies.Store("five", &five.Five{})
+	register(&one.Instance{})
+	register(&two.Instance{})
+	register(&three.Instance{})
+	register(&four.Instance{})
+	register(&five.Instance{})
+	register(&exante.Instance{})
+	register(&sandwich.Instance{})
+	register(&withholding.Instance{})
+	register(&unrealized.Instance{})
+	register(&staircase.Instance{})
+}
+
+func register(ins Strategy) {
+	allStrategies.Store(ins.Name(), ins)
 }
 
 func GetStrategy(name string) (Strategy, bool) {
