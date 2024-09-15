@@ -15,13 +15,13 @@ func CheckDuties(maxValidatorIndex int, duties []utils.ProposerDuty) ([]interfac
 		if valIdx <= maxValidatorIndex {
 			tmpsub = append(tmpsub, duty)
 		} else {
-			if len(tmpsub) > 9 {
+			if len(tmpsub) > 5 {
 				result = append(result, tmpsub)
 			}
 			tmpsub = make([]utils.ProposerDuty, 0)
 		}
 	}
-	if len(tmpsub) > 9 {
+	if len(tmpsub) > 5 {
 		result = append(result, tmpsub)
 	}
 

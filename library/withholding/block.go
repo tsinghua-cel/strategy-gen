@@ -9,28 +9,33 @@ import (
 )
 
 func BlockStrategy(cur, end int, actions map[string]string) {
+	endStage := end + 1 - cur
+	endStage += 32 / 2 // add half epoch.
 	point := pointset.GetPointByName("BlockBeforeBroadCast")
-	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", (end+1-cur)*12)
+	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", endStage*12)
 }
 
 func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
+	if len(allHacks) == 0 {
+		return nil
+	}
 	strategys := make([]types.SlotStrategy, 0)
-	for _, subduties := range allHacks {
-		duties := subduties.([]utils.ProposerDuty)
-		//begin, _ := strconv.Atoi(duties[0].Slot)
-		end, _ := strconv.Atoi(duties[len(duties)-1].Slot)
 
-		for i := 0; i < len(duties); i++ {
-			slot, _ := strconv.Atoi(duties[i].Slot)
-			//idx, _ := strconv.Atoi(duties[i].ValidatorIndex)
-			strategy := types.SlotStrategy{
-				Slot:    duties[i].Slot,
-				Level:   0,
-				Actions: make(map[string]string),
-			}
-			BlockStrategy(slot, end, strategy.Actions)
-			strategys = append(strategys, strategy)
+	// only use the last subduties
+	subduties := allHacks[len(allHacks)-1]
+
+	duties := subduties.([]utils.ProposerDuty)
+	end, _ := strconv.Atoi(duties[len(duties)-1].Slot)
+
+	for i := 0; i < len(duties); i++ {
+		slot, _ := strconv.Atoi(duties[i].Slot)
+		strategy := types.SlotStrategy{
+			Slot:    duties[i].Slot,
+			Level:   1,
+			Actions: make(map[string]string),
 		}
+		BlockStrategy(slot, end, strategy.Actions)
+		strategys = append(strategys, strategy)
 	}
 
 	return strategys
