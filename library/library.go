@@ -1,6 +1,7 @@
 package library
 
 import (
+	"github.com/tsinghua-cel/strategy-gen/library/confuse"
 	"github.com/tsinghua-cel/strategy-gen/library/exante"
 	"github.com/tsinghua-cel/strategy-gen/library/five"
 	"github.com/tsinghua-cel/strategy-gen/library/four"
@@ -36,6 +37,7 @@ func Init() {
 	register(&withholding.Instance{})
 	register(&unrealized.Instance{})
 	register(&staircase.Instance{})
+	register(&confuse.Instance{})
 }
 
 func register(ins Strategy) {
