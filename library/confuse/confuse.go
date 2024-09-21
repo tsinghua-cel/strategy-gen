@@ -55,7 +55,7 @@ func (o *Instance) Run(params types.LibraryParams) {
 				strategy := types.Strategy{}
 				strategy.Slots = GenSlotStrategy(hackDuties)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
-					log.WithField("error", err).Error("failed to update strategy")
+					log.WithField("strategy", strategy).WithError(err).Error("failed to update strategy")
 				} else {
 					log.WithFields(log.Fields{
 						"epoch":    epoch + 1,

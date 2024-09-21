@@ -10,7 +10,7 @@ func CheckDuties(maxValidatorIndex int, duties []utils.ProposerDuty) ([]interfac
 	for _, duty := range duties {
 		// filter out duties with ValidatorIndex <= maxValidatorIndex
 		dutyValIdx, _ := strconv.Atoi(duty.ValidatorIndex)
-		if dutyValIdx < maxValidatorIndex {
+		if dutyValIdx <= maxValidatorIndex {
 			result = append(result, duty)
 		}
 	}
