@@ -19,7 +19,7 @@ func UpdateStrategy(url string, strategy types.Strategy) error {
 		return err
 	}
 	if res.StatusCode != 200 {
-		return fmt.Errorf("failed to generate strategy: %s", res.Status)
+		return fmt.Errorf("failed to update strategy: %s", res.Status)
 	}
 	return nil
 }

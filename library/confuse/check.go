@@ -7,14 +7,12 @@ import (
 
 func CheckDuties(maxValidatorIndex int, duties []utils.ProposerDuty) ([]interface{}, bool) {
 	result := make([]interface{}, 0)
-	for i, duty := range duties {
+	for _, duty := range duties {
 		// filter out duties with ValidatorIndex <= maxValidatorIndex
 		dutyValIdx, _ := strconv.Atoi(duty.ValidatorIndex)
 		if dutyValIdx < maxValidatorIndex {
-			result = result[:i]
-			break
+			result = append(result, duty)
 		}
-		result = append(result, duty)
 	}
 	if len(result) > 0 {
 		return result, true
