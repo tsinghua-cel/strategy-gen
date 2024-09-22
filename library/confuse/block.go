@@ -5,6 +5,7 @@ import (
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"github.com/tsinghua-cel/strategy-gen/utils"
+	"math/rand"
 	"strconv"
 )
 
@@ -59,6 +60,23 @@ func BlockStrategy3(idx, cur, lastSlot int, actions map[string]string) {
 	actions["AttestBeforeBroadCast"] = fmt.Sprintf("return")
 }
 
+func BlockStrategy4(idx, cur, end int, actions map[string]string) {
+	// random generate a new strategy.
+	// block and attest broadcast delay random time.
+	// block modify parent root to last epoch end slot.
+	blockPoints := []string{"BlockBeforeBroadCast", "BlockBeforeSign"}
+	attestPoints := []string{"AttestBeforeBroadCast", "AttestBeforeSign"}
+	blockpoint := blockPoints[rand.Intn(len(blockPoints))]
+	attestpoint := attestPoints[rand.Intn(len(attestPoints))]
+	actions[blockpoint] = fmt.Sprintf("delayWithSecond:%d", rand.Intn(80)+10)
+	actions[attestpoint] = fmt.Sprintf("delayWithSecond:%d", rand.Intn(80)+10)
+	lastEpoch := utils.SlotTool{32}.SlotToEpoch(int64(end)) - 1
+	if data, exist := stageCache.Get(lastEpoch); exist {
+		info := data.(stageInfo)
+		actions["BlockGetNewParentRoot"] = fmt.Sprintf("modifyParentRoot:%d", rand.Intn(int(info.endSlot))+1)
+	}
+}
+
 func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
 	if len(allHacks) == 0 {
 		return nil
@@ -85,13 +103,17 @@ func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
 			lastSlot, _ = strconv.ParseInt(allHacks[i-1].(utils.ProposerDuty).Slot, 10, 64)
 		}
 
-		switch epoch / epochPerStage {
+		stage := rand.Intn(4) + 1
+		//stage := epoch / epochPerStage
+		switch stage {
 		case 1:
 			BlockStrategy(i, int(slot), int(endSlot), strategy.Actions)
 		case 2:
 			BlockStrategy2(i, int(slot), int(endSlot), strategy.Actions)
 		case 3:
 			BlockStrategy3(i, int(slot), int(lastSlot), strategy.Actions)
+		case 4:
+			BlockStrategy4(i, int(slot), int(endSlot), strategy.Actions)
 		default:
 			BlockStrategy(i, int(slot), int(endSlot), strategy.Actions)
 		}
