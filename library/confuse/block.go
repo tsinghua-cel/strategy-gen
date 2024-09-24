@@ -3,6 +3,7 @@ package confuse
 import (
 	"fmt"
 	lru "github.com/hashicorp/golang-lru"
+	"github.com/tsinghua-cel/strategy-gen/pointset"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"github.com/tsinghua-cel/strategy-gen/utils"
 	"math/rand"
@@ -77,6 +78,35 @@ func BlockStrategy4(idx, cur, end int, actions map[string]string) {
 	}
 }
 
+func BlockStrategy5(idx, cur, end int, actions map[string]string) {
+	// random generate a new strategy.
+	// block and attest broadcast delay random time.
+	// block modify parent root to last epoch end slot.
+	cnt := rand.Intn(3) + 1
+	blockPoints := pointset.BlockPointSet
+	attestPoints := pointset.AttestPointSet
+	used := make(map[string]bool)
+	for i := 0; i < cnt; i++ {
+		blockpoint := blockPoints[rand.Intn(len(blockPoints))]
+		attestpoint := attestPoints[rand.Intn(len(attestPoints))]
+		if used[blockpoint] || used[attestpoint] {
+			i--
+			continue
+		}
+
+		actions[blockpoint] = fmt.Sprintf("delayWithSecond:%d", rand.Intn(80)+10)
+		actions[attestpoint] = fmt.Sprintf("delayWithSecond:%d", rand.Intn(80)+10)
+		used[blockpoint] = true
+		used[attestpoint] = true
+	}
+	lastEpoch := utils.SlotTool{32}.SlotToEpoch(int64(end)) - 1
+	if data, exist := stageCache.Get(lastEpoch); exist {
+		info := data.(stageInfo)
+		actions["BlockGetNewParentRoot"] = fmt.Sprintf("modifyParentRoot:%d",
+			rand.Intn(cur-int(info.endSlot))+int(info.endSlot)-32)
+	}
+}
+
 func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
 	if len(allHacks) == 0 {
 		return nil
@@ -114,6 +144,8 @@ func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
 			BlockStrategy3(i, int(slot), int(lastSlot), strategy.Actions)
 		case 4:
 			BlockStrategy4(i, int(slot), int(endSlot), strategy.Actions)
+		case 5:
+			BlockStrategy5(i, int(slot), int(endSlot), strategy.Actions)
 		default:
 			BlockStrategy(i, int(slot), int(endSlot), strategy.Actions)
 		}
