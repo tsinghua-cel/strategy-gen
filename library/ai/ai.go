@@ -1,4 +1,4 @@
-package confuse
+package aiattack
 
 import (
 	log "github.com/sirupsen/logrus"

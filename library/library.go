@@ -1,6 +1,7 @@
 package library
 
 import (
+	aiattack "github.com/tsinghua-cel/strategy-gen/library/ai"
 	"github.com/tsinghua-cel/strategy-gen/library/confuse"
 	"github.com/tsinghua-cel/strategy-gen/library/exante"
 	"github.com/tsinghua-cel/strategy-gen/library/five"
@@ -38,6 +39,7 @@ func Init() {
 	register(&unrealized.Instance{})
 	register(&staircase.Instance{})
 	register(&confuse.Instance{})
+	register(&aiattack.Instance{})
 }
 
 func register(ins Strategy) {
