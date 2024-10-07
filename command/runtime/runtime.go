@@ -56,6 +56,13 @@ func setFlags(cmd *cobra.Command) {
 		"the max hack validator index",
 	)
 
+	cmd.Flags().IntVar(
+		&params.minValidatorIndex,
+		minValidatorIndexFlag,
+		0,
+		"the min hack validator index",
+	)
+
 	cmd.Flags().StringVar(
 		&params.attacker,
 		attackerFlag,
@@ -104,6 +111,7 @@ func runCommand(cmd *cobra.Command, _ []string) {
 	strategy.Run(types.LibraryParams{
 		Attacker:          params.attacker,
 		MaxValidatorIndex: params.maxValidatorIndex,
+		MinValidatorIndex: params.minValidatorIndex,
 	})
 
 }

@@ -51,7 +51,7 @@ func (o *Instance) Run(params types.LibraryParams) {
 				latestEpoch = epoch - 1
 				continue
 			}
-			if hackDuties, happen := CheckDuties(params.MaxValidatorIndex, duties); happen {
+			if hackDuties, happen := CheckDuties(params, duties); happen {
 				strategy := types.Strategy{}
 				strategy.Slots = GenSlotStrategy(hackDuties)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {

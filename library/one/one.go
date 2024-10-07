@@ -58,7 +58,7 @@ func (o *Instance) Run(params types.LibraryParams) {
 				latestEpoch = epoch - 1
 				continue
 			}
-			if hackDuties, happen := CheckDuties(params.MaxValidatorIndex, duties); happen {
+			if hackDuties, happen := CheckDuties(params, duties); happen {
 				strategy := types.Strategy{}
 				strategy.Validators = ValidatorStrategy(hackDuties)
 				strategy.Slots = GenSlotStrategy(hackDuties)

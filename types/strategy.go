@@ -42,4 +42,9 @@ func GetValidatorStrategy(startIndex, endIndex int, startSlot, endSlot int) []Va
 type LibraryParams struct {
 	Attacker          string
 	MaxValidatorIndex int
+	MinValidatorIndex int
+}
+
+func IsHackValidator(valIdx int, params LibraryParams) bool {
+	return valIdx >= params.MinValidatorIndex && valIdx <= params.MaxValidatorIndex
 }

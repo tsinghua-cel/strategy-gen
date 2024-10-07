@@ -79,13 +79,13 @@ func (o *Instance) Run(params types.LibraryParams) {
 					continue
 				}
 				strategy := types.Strategy{}
-				strategy.Validators = ValidatorStrategy(params.MaxValidatorIndex, nextEpoch)
-				if checkFirstByzSlot(preDuties, params.MaxValidatorIndex) &&
-					checkFirstByzSlot(curDuties, params.MaxValidatorIndex) &&
-					!checkFirstByzSlot(nextDuties, params.MaxValidatorIndex) {
+				strategy.Validators = ValidatorStrategy(params, nextEpoch)
+				if checkFirstByzSlot(preDuties, params) &&
+					checkFirstByzSlot(curDuties, params) &&
+					!checkFirstByzSlot(nextDuties, params) {
 					cas = 1
 				}
-				strategy.Slots = GenSlotStrategy(getLatestHackerSlot(nextDuties, params.MaxValidatorIndex), nextEpoch, cas)
+				strategy.Slots = GenSlotStrategy(getLatestHackerSlot(nextDuties, params), nextEpoch, cas)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
 					log.WithField("error", err).Error("failed to update strategy")
 				} else {
@@ -99,12 +99,12 @@ func (o *Instance) Run(params types.LibraryParams) {
 	}
 }
 
-func getLatestHackerSlot(duties []utils.ProposerDuty, maxValidatorIndex int) int {
+func getLatestHackerSlot(duties []utils.ProposerDuty, param types.LibraryParams) int {
 	latest, _ := strconv.Atoi(duties[0].Slot)
 	for _, duty := range duties {
 		idx, _ := strconv.Atoi(duty.ValidatorIndex)
 		slot, _ := strconv.Atoi(duty.Slot)
-		if idx > maxValidatorIndex {
+		if !types.IsHackValidator(idx, param) {
 			continue
 		}
 		if slot > latest {
@@ -115,9 +115,9 @@ func getLatestHackerSlot(duties []utils.ProposerDuty, maxValidatorIndex int) int
 
 }
 
-func checkFirstByzSlot(duties []utils.ProposerDuty, maxValidatorIndex int) bool {
+func checkFirstByzSlot(duties []utils.ProposerDuty, param types.LibraryParams) bool {
 	firstproposerindex, _ := strconv.Atoi(duties[0].ValidatorIndex)
-	if firstproposerindex > maxValidatorIndex {
+	if !types.IsHackValidator(firstproposerindex, param) {
 		return false
 	}
 	return true

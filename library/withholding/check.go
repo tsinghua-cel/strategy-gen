@@ -1,18 +1,19 @@
 package withholding
 
 import (
+	"github.com/tsinghua-cel/strategy-gen/types"
 	"github.com/tsinghua-cel/strategy-gen/utils"
 	"strconv"
 )
 
-func CheckDuties(maxValidatorIndex int, duties []utils.ProposerDuty) ([]interface{}, bool) {
+func CheckDuties(param types.LibraryParams, duties []utils.ProposerDuty) ([]interface{}, bool) {
 	result := make([]interface{}, 0)
 
 	tmpsub := make([]utils.ProposerDuty, 0)
 	for _, duty := range duties {
 		valIdx, _ := strconv.Atoi(duty.ValidatorIndex)
 
-		if valIdx <= maxValidatorIndex {
+		if types.IsHackValidator(valIdx, param) {
 			tmpsub = append(tmpsub, duty)
 		} else {
 			if len(tmpsub) > 5 {
