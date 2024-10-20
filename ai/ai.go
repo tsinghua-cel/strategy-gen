@@ -5,6 +5,7 @@ import (
 	"github.com/sashabaranov/go-openai"
 	"github.com/sashabaranov/go-openai/jsonschema"
 	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 type AI struct {
@@ -18,10 +19,13 @@ func NewAI() *AI {
 }
 
 func getClient() *openai.Client {
-	key := ""
+	key := os.Getenv("OPENAI_API_KEY")
+	url := os.Getenv("OPENAI_API_URL")
 
 	cfg := openai.DefaultConfig(key)
-	cfg.BaseURL = "https://api-us.luee.net/v1"
+	if len(url) != 0 {
+		cfg.BaseURL = url
+	}
 
 	client := openai.NewClientWithConfig(cfg)
 	return client
