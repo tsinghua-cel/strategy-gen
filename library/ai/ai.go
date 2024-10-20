@@ -14,10 +14,6 @@ type Instance struct {
 	mux        sync.Mutex
 }
 
-func (o *Instance) RunWithFeedback(param types.LibraryParams, feedback types.FeedBacker) {
-	o.run(param, feedback)
-}
-
 func (o *Instance) Name() string {
 	return "ai"
 }
@@ -27,8 +23,8 @@ func (o *Instance) Description() string {
 	return desc_eng
 }
 
-func (o *Instance) Run(params types.LibraryParams) {
-	o.run(params, nil)
+func (o *Instance) Run(params types.LibraryParams, feedbacker types.FeedBacker) {
+	o.run(params, feedbacker)
 }
 
 func (o *Instance) run(params types.LibraryParams, feedbacker types.FeedBacker) {

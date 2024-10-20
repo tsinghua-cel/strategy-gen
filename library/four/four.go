@@ -11,11 +11,6 @@ import (
 type Instance struct {
 }
 
-func (o *Instance) RunWithFeedback(param types.LibraryParams, feedback types.FeedBacker) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (o *Instance) Name() string {
 	return "four"
 }
@@ -34,7 +29,7 @@ func (o *Instance) Description() string {
 	return desc_eng
 }
 
-func (o *Instance) Run(params types.LibraryParams) {
+func (o *Instance) Run(params types.LibraryParams, feedbacker types.FeedBacker) {
 	log.WithField("name", o.Name()).Info("start to run strategy")
 	var latestEpoch int64 = -1
 	ticker := time.NewTicker(time.Second * 3)

@@ -19,9 +19,8 @@ import (
 
 type Strategy interface {
 	Name() string
-	Run(param types.LibraryParams)
+	Run(param types.LibraryParams, feedbacker types.FeedBacker)
 	Description() string
-	RunWithFeedback(param types.LibraryParams, feedbacker types.FeedBacker)
 }
 
 var (

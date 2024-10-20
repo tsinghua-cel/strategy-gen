@@ -115,13 +115,7 @@ func runCommand(cmd *cobra.Command, _ []string) {
 		Attacker:          params.attacker,
 		MaxValidatorIndex: params.maxValidatorIndex,
 		MinValidatorIndex: params.minValidatorIndex,
-	})
-	strategy.RunWithFeedbacker(types.LibraryParams{
-		Attacker:          params.attacker,
-		MaxValidatorIndex: params.maxValidatorIndex,
-		MinValidatorIndex: params.minValidatorIndex,
 	}, feedbacker)
-
 }
 
 func listLibrary() {
