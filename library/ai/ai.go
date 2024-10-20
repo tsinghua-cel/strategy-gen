@@ -1,13 +1,21 @@
 package aiattack
 
 import (
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"github.com/tsinghua-cel/strategy-gen/utils"
+	"sync"
 	"time"
 )
 
 type Instance struct {
+	strategies map[string]types.Strategy
+	mux        sync.Mutex
+}
+
+func (o *Instance) RunWithFeedback(param types.LibraryParams, feedback types.FeedBacker) {
+	o.run(param, feedback)
 }
 
 func (o *Instance) Name() string {
@@ -20,6 +28,33 @@ func (o *Instance) Description() string {
 }
 
 func (o *Instance) Run(params types.LibraryParams) {
+	o.run(params, nil)
+}
+
+func (o *Instance) run(params types.LibraryParams, feedbacker types.FeedBacker) {
+	feedbackCh := make(chan types.FeedBack, 100)
+	updateFeedBack := func() {
+		for {
+			select {
+			case info, ok := <-feedbackCh:
+				if !ok {
+					return
+				}
+				o.mux.Lock()
+				if strategy, exist := o.strategies[info.Uid]; exist {
+					err := AddFeedBack(strategy, info.Info)
+					if err != nil {
+						log.WithField("error", err).Error("failed to add feedback to ai")
+					}
+				}
+				o.mux.Unlock()
+			}
+		}
+	}
+	if feedbacker != nil {
+		go updateFeedBack()
+	}
+
 	log.WithField("name", o.Name()).Info("start to run strategy")
 	var latestEpoch int64
 	ticker := time.NewTicker(time.Second * 3)
@@ -53,6 +88,7 @@ func (o *Instance) Run(params types.LibraryParams) {
 			}
 			if hackDuties, happen := CheckDuties(params, duties); happen {
 				strategy := types.Strategy{}
+				strategy.Uid = uuid.NewString()
 				strategy.Slots = GenSlotStrategy(hackDuties)
 				if strategy.Slots == nil {
 					log.Error("failed to generate slot strategy")
@@ -65,6 +101,12 @@ func (o *Instance) Run(params types.LibraryParams) {
 						"epoch":    epoch + 1,
 						"strategy": strategy,
 					}).Info("update strategy successfully")
+				}
+				if feedbacker != nil {
+					o.mux.Lock()
+					o.strategies[strategy.Uid] = strategy
+					o.mux.Unlock()
+					feedbacker.WaitFeedback(strategy.Uid, feedbackCh)
 				}
 			}
 		}

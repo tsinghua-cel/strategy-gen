@@ -24,6 +24,24 @@ func UpdateStrategy(url string, strategy types.Strategy) error {
 	return nil
 }
 
+func GetStrategyFeedback(url string, uid string) (types.FeedBackInfo, error) {
+	res, err := http.Get(fmt.Sprintf("http://%s/v1/strategy-feedback/%s", url, uid))
+	if err != nil {
+		return types.FeedBackInfo{}, err
+	}
+	if res.StatusCode != 200 {
+		return types.FeedBackInfo{}, fmt.Errorf("failed to get strategy feedback: %s", res.Status)
+	}
+	// parse response body to types.FeedBackInfo
+	var feedback types.FeedBackInfo
+	err = json.NewDecoder(res.Body).Decode(&feedback)
+	if err != nil {
+		return types.FeedBackInfo{}, err
+	}
+	// do something with feedback
+	return feedback, nil
+}
+
 func GetCurSlot(url string) (int, error) {
 	res, err := http.Get(fmt.Sprintf("http://%s/v1/curslot", url))
 	if err != nil {

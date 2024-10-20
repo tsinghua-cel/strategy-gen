@@ -9,6 +9,11 @@ import (
 
 type Instance struct{}
 
+func (o *Instance) RunWithFeedback(param types.LibraryParams, feedback types.FeedBacker) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (o *Instance) Name() string {
 	return "one"
 }

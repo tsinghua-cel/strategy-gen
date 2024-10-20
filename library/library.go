@@ -21,6 +21,7 @@ type Strategy interface {
 	Name() string
 	Run(param types.LibraryParams)
 	Description() string
+	RunWithFeedback(param types.LibraryParams, feedbacker types.FeedBacker)
 }
 
 var (

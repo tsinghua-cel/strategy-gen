@@ -4,6 +4,7 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/tsinghua-cel/strategy-gen/feedback"
 	"github.com/tsinghua-cel/strategy-gen/library"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"os"
@@ -107,12 +108,19 @@ func runCommand(cmd *cobra.Command, _ []string) {
 	if !ok {
 		log.Fatalf("strategy %s not found", params.strategy)
 	}
+	feedbacker := feedback.NewFeedbacker(params.attacker)
+	feedbacker.Start()
 
 	strategy.Run(types.LibraryParams{
 		Attacker:          params.attacker,
 		MaxValidatorIndex: params.maxValidatorIndex,
 		MinValidatorIndex: params.minValidatorIndex,
 	})
+	strategy.RunWithFeedbacker(types.LibraryParams{
+		Attacker:          params.attacker,
+		MaxValidatorIndex: params.maxValidatorIndex,
+		MinValidatorIndex: params.minValidatorIndex,
+	}, feedbacker)
 
 }
 

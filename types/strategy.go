@@ -18,6 +18,7 @@ type SlotStrategy struct {
 }
 
 type Strategy struct {
+	Uid        string              `json:"uid"`
 	Slots      []SlotStrategy      `json:"slots"`
 	Validators []ValidatorStrategy `json:"validator"`
 }

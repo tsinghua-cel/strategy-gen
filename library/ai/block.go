@@ -3,6 +3,7 @@ package aiattack
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/tsinghua-cel/strategy-gen/ai"
@@ -30,6 +31,21 @@ func initAgent() {
 		agent = ai.NewAI().NewSession(context.TODO(), prompt)
 		log.WithField("prompt", prompt).Info("read prompt success")
 	}
+}
+
+func AddFeedBack(strategy types.Strategy, info types.FeedBackInfo) error {
+	if agent == nil {
+		return errors.New("agent is nil")
+	}
+	format := "I have a feedback for you, this feedback is about the strategy you provided me history. Detail strategy is `%s` and the feedback is `%s`."
+
+	content, err := agent.Ask(fmt.Sprintf(format, strategy, info))
+	if err != nil {
+		log.WithError(err).Error("agent.Ask() failed")
+		return err
+	}
+	log.WithField("response", content).Info("add feedback success")
+	return nil
 }
 
 func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
