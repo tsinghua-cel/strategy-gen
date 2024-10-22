@@ -12,6 +12,7 @@ import (
 type Instance struct {
 	strategies map[string]types.Strategy
 	mux        sync.Mutex
+	once       sync.Once
 }
 
 func (o *Instance) Name() string {
@@ -27,7 +28,13 @@ func (o *Instance) Run(params types.LibraryParams, feedbacker types.FeedBacker) 
 	o.run(params, feedbacker)
 }
 
+func (o *Instance) init() {
+	o.strategies = make(map[string]types.Strategy)
+}
+
 func (o *Instance) run(params types.LibraryParams, feedbacker types.FeedBacker) {
+	o.once.Do(o.init)
+
 	feedbackCh := make(chan types.FeedBack, 100)
 	updateFeedBack := func() {
 		for {
