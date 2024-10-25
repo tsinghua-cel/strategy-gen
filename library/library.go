@@ -7,6 +7,7 @@ import (
 	"github.com/tsinghua-cel/strategy-gen/library/five"
 	"github.com/tsinghua-cel/strategy-gen/library/four"
 	"github.com/tsinghua-cel/strategy-gen/library/one"
+	"github.com/tsinghua-cel/strategy-gen/library/randomdelay"
 	"github.com/tsinghua-cel/strategy-gen/library/sandwich"
 	"github.com/tsinghua-cel/strategy-gen/library/staircase"
 	"github.com/tsinghua-cel/strategy-gen/library/three"
@@ -40,6 +41,7 @@ func Init() {
 	register(&staircase.Instance{})
 	register(&confuse.Instance{})
 	register(&aiattack.Instance{})
+	register(&randomdelay.Instance{})
 }
 
 func register(ins Strategy) {

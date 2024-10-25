@@ -28,6 +28,11 @@ func (s Strategy) ToFile(name string) error {
 	return os.WriteFile(name, d, 0644)
 }
 
+func (s Strategy) String() string {
+	d, _ := json.MarshalIndent(s, "", "  ")
+	return string(d)
+}
+
 func GetValidatorStrategy(startIndex, endIndex int, startSlot, endSlot int) []ValidatorStrategy {
 	res := make([]ValidatorStrategy, 0)
 	for i := startIndex; i <= endIndex; i++ {

@@ -1,4 +1,4 @@
-package aiattack
+package randomdelay
 
 import (
 	"github.com/google/uuid"
@@ -16,23 +16,20 @@ type Instance struct {
 }
 
 func (o *Instance) Name() string {
-	return "ai"
+	return "random delay"
 }
 
 func (o *Instance) Description() string {
-	desc_eng := `ai generate strategy.`
+	desc_eng := `delay random time (10~40) in random point.`
 	return desc_eng
-}
-
-func (o *Instance) Run(params types.LibraryParams, feedbacker types.FeedBacker) {
-	o.run(params, feedbacker)
 }
 
 func (o *Instance) init() {
 	o.strategies = make(map[string]types.Strategy)
 }
 
-func (o *Instance) run(params types.LibraryParams, feedbacker types.FeedBacker) {
+func (o *Instance) Run(params types.LibraryParams, feedbacker types.FeedBacker) {
+	log.WithField("name", o.Name()).Info("start to run strategy")
 	o.once.Do(o.init)
 
 	feedbackCh := make(chan types.FeedBack, 100)
@@ -44,11 +41,18 @@ func (o *Instance) run(params types.LibraryParams, feedbacker types.FeedBacker) 
 					return
 				}
 				o.mux.Lock()
-				if strategy, exist := o.strategies[info.Uid]; exist {
-					err := AddFeedBack(strategy, info.Info)
-					if err != nil {
-						log.WithField("error", err).Error("failed to add feedback to ai")
+				if s, exist := o.strategies[info.Uid]; exist {
+					log.WithFields(log.Fields{
+						"uid":  info.Uid,
+						"info": info.Info,
+					}).Info("get feedback")
+					if info.Info.ReorgCount > 0 || info.Info.ImpactValidatorCount > 0 {
+						log.WithFields(log.Fields{
+							"uid":      info.Uid,
+							"strategy": s.String(),
+						}).Info("feedback have good impact, please save it")
 					}
+					// todo: update strategy with feedback.
 				}
 				o.mux.Unlock()
 			}
@@ -58,7 +62,6 @@ func (o *Instance) run(params types.LibraryParams, feedbacker types.FeedBacker) 
 		go updateFeedBack()
 	}
 
-	log.WithField("name", o.Name()).Info("start to run strategy")
 	var latestEpoch int64
 	ticker := time.NewTicker(time.Second * 3)
 	slotTool := utils.SlotTool{SlotsPerEpoch: 32}
@@ -93,10 +96,6 @@ func (o *Instance) run(params types.LibraryParams, feedbacker types.FeedBacker) 
 				strategy := types.Strategy{}
 				strategy.Uid = uuid.NewString()
 				strategy.Slots = GenSlotStrategy(hackDuties)
-				if strategy.Slots == nil {
-					log.Error("failed to generate slot strategy")
-					continue
-				}
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
 					log.WithField("strategy", strategy).WithError(err).Error("failed to update strategy")
 				} else {
