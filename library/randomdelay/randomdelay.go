@@ -16,7 +16,7 @@ type Instance struct {
 }
 
 func (o *Instance) Name() string {
-	return "random delay"
+	return "randomdelay"
 }
 
 func (o *Instance) Description() string {
