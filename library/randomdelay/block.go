@@ -32,7 +32,7 @@ const (
 var (
 	SecondsPerSlot = 12
 	stageCache, _  = lru.New(100)
-	points         = []ActionPoint{
+	allPoints      = []ActionPoint{
 		AttestBeforeBroadCast,
 		AttestAfterBroadCast,
 		AttestBeforeSign,
@@ -46,6 +46,22 @@ var (
 		BlockAfterSign,
 		BlockBeforePropose,
 		BlockAfterPropose,
+		BlockGetNewParentRoot,
+	}
+	beforePoint = []ActionPoint{
+		AttestBeforeBroadCast,
+		//AttestAfterBroadCast,
+		AttestBeforeSign,
+		//AttestAfterSign,
+		AttestBeforePropose,
+		//AttestAfterPropose,
+		BlockDelayForReceiveBlock,
+		BlockBeforeBroadCast,
+		//BlockAfterBroadCast,
+		BlockBeforeSign,
+		//BlockAfterSign,
+		BlockBeforePropose,
+		//BlockAfterPropose,
 		BlockGetNewParentRoot,
 	}
 )
@@ -71,14 +87,24 @@ func (s *RSet) PopRandom() (ActionPoint, error) {
 	return item, nil
 }
 
-func BlockStrategy(idx, cur, end int, actions map[string]string) {
+func strategy2(idx, cur, end int, actions map[string]string) {
+	// delay random time before all broadcast point.
+	baseDelay := 10 + idx
+	for _, point := range beforePoint {
+		delay := rand.Intn(20) + baseDelay
+		actions[string(point)] = fmt.Sprintf("%s:%d", "delayWithSecond", delay)
+	}
+}
+
+func strategy1(idx, cur, end int, actions map[string]string) {
+	// random select some point and delay random time.
 	baseDelay := 10 + idx
 	basePointCount := 4
 
 	all := &RSet{
 		items: make([]ActionPoint, 0),
 	}
-	all.Add(points)
+	all.Add(allPoints)
 
 	count := rand.Intn(3) + basePointCount
 	for i := 0; i < count; i++ {
@@ -88,6 +114,14 @@ func BlockStrategy(idx, cur, end int, actions map[string]string) {
 			delay := rand.Intn(20) + baseDelay
 			actions[string(point)] = fmt.Sprintf("%s:%d", "delayWithSecond", delay)
 		}
+	}
+}
+
+func BlockStrategy(idx, cur, end int, actions map[string]string) {
+	if cur%300 < 150 {
+		strategy2(idx, cur, end, actions)
+	} else {
+		strategy1(idx, cur, end, actions)
 	}
 }
 
