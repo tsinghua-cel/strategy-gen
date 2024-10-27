@@ -5,7 +5,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/tsinghua-cel/strategy-gen/types"
+	"net"
 	"net/http"
+	"time"
+)
+
+var (
+	hclient = &http.Client{
+		Transport: &http.Transport{
+			MaxIdleConns:        100,
+			MaxIdleConnsPerHost: 100,
+			IdleConnTimeout:     90 * time.Second,
+			TLSHandshakeTimeout: 10 * time.Second,
+			DisableCompression:  true,
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).DialContext,
+		},
+		Timeout: 30 * time.Second,
+	}
 )
 
 func UpdateStrategy(url string, strategy types.Strategy) error {
@@ -14,7 +33,7 @@ func UpdateStrategy(url string, strategy types.Strategy) error {
 		return err
 	}
 
-	res, err := http.Post(fmt.Sprintf("http://%s/v1/update-strategy", url), "application/json", bytes.NewReader(d))
+	res, err := hclient.Post(fmt.Sprintf("http://%s/v1/update-strategy", url), "application/json", bytes.NewReader(d))
 	if err != nil {
 		return err
 	}
@@ -25,7 +44,7 @@ func UpdateStrategy(url string, strategy types.Strategy) error {
 }
 
 func GetStrategyFeedback(url string, uid string) (types.FeedBackInfo, error) {
-	res, err := http.Get(fmt.Sprintf("http://%s/v1/strategy-feedback/%s", url, uid))
+	res, err := hclient.Get(fmt.Sprintf("http://%s/v1/strategy-feedback/%s", url, uid))
 	if err != nil {
 		return types.FeedBackInfo{}, err
 	}
@@ -43,7 +62,7 @@ func GetStrategyFeedback(url string, uid string) (types.FeedBackInfo, error) {
 }
 
 func GetCurSlot(url string) (int, error) {
-	res, err := http.Get(fmt.Sprintf("http://%s/v1/curslot", url))
+	res, err := hclient.Get(fmt.Sprintf("http://%s/v1/curslot", url))
 	if err != nil {
 		return 0, err
 	}
@@ -60,7 +79,7 @@ func GetCurSlot(url string) (int, error) {
 }
 
 func GetHeadSlot(url string) (int, error) {
-	res, err := http.Get(fmt.Sprintf("http://%s/v1/slot", url))
+	res, err := hclient.Get(fmt.Sprintf("http://%s/v1/slot", url))
 	if err != nil {
 		return 0, err
 	}
@@ -77,7 +96,7 @@ func GetHeadSlot(url string) (int, error) {
 }
 
 func GetEpoch(url string) (int, error) {
-	res, err := http.Get(fmt.Sprintf("http://%s/v1/epoch", url))
+	res, err := hclient.Get(fmt.Sprintf("http://%s/v1/epoch", url))
 	if err != nil {
 		return 0, err
 	}
@@ -100,7 +119,7 @@ type ProposerDuty struct {
 }
 
 func GetEpochDuties(url string, epoch int64) ([]ProposerDuty, error) {
-	res, err := http.Get(fmt.Sprintf("http://%s/v1/duties/%d", url, epoch))
+	res, err := hclient.Get(fmt.Sprintf("http://%s/v1/duties/%d", url, epoch))
 	if err != nil {
 		return nil, err
 	}
