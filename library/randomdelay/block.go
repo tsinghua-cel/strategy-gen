@@ -89,7 +89,7 @@ func (s *RSet) PopRandom() (ActionPoint, error) {
 
 func strategy2(idx, cur, end int, actions map[string]string) {
 	// delay random time before all broadcast point.
-	baseDelay := 10 + idx
+	baseDelay := 30 + idx*5
 	for _, point := range beforePoint {
 		delay := rand.Intn(20) + baseDelay
 		actions[string(point)] = fmt.Sprintf("%s:%d", "delayWithSecond", delay)
@@ -98,7 +98,7 @@ func strategy2(idx, cur, end int, actions map[string]string) {
 
 func strategy1(idx, cur, end int, actions map[string]string) {
 	// random select some point and delay random time.
-	baseDelay := 10 + idx
+	baseDelay := 30 + idx*5
 	basePointCount := 4
 
 	all := &RSet{
