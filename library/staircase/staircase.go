@@ -1,6 +1,7 @@
 package staircase
 
 import (
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"github.com/tsinghua-cel/strategy-gen/utils"
@@ -85,6 +86,7 @@ func (o *Instance) Run(params types.LibraryParams, feedbacker types.FeedBacker) 
 					!checkFirstByzSlot(nextDuties, params) {
 					cas = 1
 				}
+				strategy.Uid = uuid.NewString()
 				strategy.Slots = GenSlotStrategy(getLatestHackerSlot(nextDuties, params), nextEpoch, cas)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
 					log.WithField("error", err).Error("failed to update strategy")

@@ -1,6 +1,7 @@
 package two
 
 import (
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"github.com/tsinghua-cel/strategy-gen/utils"
@@ -69,6 +70,7 @@ func (o *Instance) Run(params types.LibraryParams, feedbacker types.FeedBacker) 
 					continue
 				}
 				strategy := types.Strategy{}
+				strategy.Uid = uuid.NewString()
 				strategy.Validators = ValidatorStrategy(params, nextEpoch)
 				strategy.Slots = GenSlotStrategy(getLatestHackerSlot(duties, params), nextEpoch)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {

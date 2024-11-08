@@ -1,6 +1,7 @@
 package exante
 
 import (
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"github.com/tsinghua-cel/strategy-gen/utils"
@@ -56,6 +57,7 @@ func (o *Instance) Run(params types.LibraryParams, feedbacker types.FeedBacker) 
 			}
 			if hackDuties, happen := CheckDuties(params, duties); happen {
 				strategy := types.Strategy{}
+				strategy.Uid = uuid.NewString()
 				strategy.Validators = ValidatorStrategy(hackDuties)
 				strategy.Slots = GenSlotStrategy(hackDuties)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
