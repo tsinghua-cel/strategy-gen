@@ -38,7 +38,11 @@ func UpdateStrategy(url string, strategy types.Strategy) error {
 		return err
 	}
 	if res.StatusCode != 200 {
-		return fmt.Errorf("failed to update strategy: %s", res.Status)
+		// get response string message from body
+		var msg string
+		err = json.NewDecoder(res.Body).Decode(&msg)
+
+		return fmt.Errorf("failed to update strategy: %s", msg)
 	}
 	return nil
 }
