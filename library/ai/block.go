@@ -8,7 +8,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tsinghua-cel/strategy-gen/ai"
 	"github.com/tsinghua-cel/strategy-gen/types"
-	"github.com/tsinghua-cel/strategy-gen/utils"
 	"os"
 	"strings"
 	"sync"
@@ -48,15 +47,14 @@ func AddFeedBack(strategy types.Strategy, info types.FeedBackInfo) error {
 	return nil
 }
 
-func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
+func GenSlotStrategy(allHacks []types.ProposerDuty) []types.SlotStrategy {
 	if len(allHacks) == 0 {
 		return nil
 	}
 	initonce.Do(initAgent)
 	var strategies []types.SlotStrategy
 	slots := ""
-	for i, iduty := range allHacks {
-		duty := iduty.(utils.ProposerDuty)
+	for i, duty := range allHacks {
 		if i == (len(allHacks) - 1) {
 			slots = fmt.Sprintf("%s%s", slots, duty.Slot)
 		} else {

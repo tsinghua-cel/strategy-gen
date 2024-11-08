@@ -21,6 +21,10 @@ func (f *Feedbacker) WaitFeedback(uid string, ch chan types.FeedBack) {
 	f.tasks.Store(uid, ch)
 }
 
+func (f *Feedbacker) RemoveFeedback(uid string) {
+	f.tasks.Delete(uid)
+}
+
 func (f *Feedbacker) Start() {
 	go f.loop()
 }

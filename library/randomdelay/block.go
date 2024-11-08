@@ -4,7 +4,6 @@ import (
 	"fmt"
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/tsinghua-cel/strategy-gen/types"
-	"github.com/tsinghua-cel/strategy-gen/utils"
 	"math/rand"
 	"strconv"
 	"time"
@@ -125,15 +124,14 @@ func BlockStrategy(idx, cur, end int, actions map[string]string) {
 	}
 }
 
-func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
+func GenSlotStrategy(allHacks []types.ProposerDuty) []types.SlotStrategy {
 	if len(allHacks) == 0 {
 		return nil
 	}
-	latestDuty := allHacks[len(allHacks)-1].(utils.ProposerDuty)
+	latestDuty := allHacks[len(allHacks)-1]
 	endSlot, _ := strconv.ParseInt(latestDuty.Slot, 10, 64)
 	strategys := make([]types.SlotStrategy, 0)
-	for i, iduty := range allHacks {
-		duty := iduty.(utils.ProposerDuty)
+	for i, duty := range allHacks {
 		slot, _ := strconv.ParseInt(duty.Slot, 10, 64)
 		strategy := types.SlotStrategy{
 			Slot:    duty.Slot,

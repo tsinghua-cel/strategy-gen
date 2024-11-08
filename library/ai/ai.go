@@ -1,6 +1,7 @@
 package aiattack
 
 import (
+	"context"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/tsinghua-cel/strategy-gen/types"
@@ -24,21 +25,23 @@ func (o *Instance) Description() string {
 	return desc_eng
 }
 
-func (o *Instance) Run(params types.LibraryParams, feedbacker types.FeedBacker) {
-	o.run(params, feedbacker)
+func (o *Instance) Run(ctx context.Context, params types.LibraryParams, feedbacker types.FeedBacker) {
+	o.run(ctx, params, feedbacker)
 }
 
 func (o *Instance) init() {
 	o.strategies = make(map[string]types.Strategy)
 }
 
-func (o *Instance) run(params types.LibraryParams, feedbacker types.FeedBacker) {
+func (o *Instance) run(ctx context.Context, params types.LibraryParams, feedbacker types.FeedBacker) {
 	o.once.Do(o.init)
 
 	feedbackCh := make(chan types.FeedBack, 100)
 	updateFeedBack := func() {
 		for {
 			select {
+			case <-ctx.Done():
+				return
 			case info, ok := <-feedbackCh:
 				if !ok {
 					return
@@ -64,6 +67,9 @@ func (o *Instance) run(params types.LibraryParams, feedbacker types.FeedBacker) 
 	slotTool := utils.SlotTool{SlotsPerEpoch: 32}
 	for {
 		select {
+		case <-ctx.Done():
+			log.WithField("name", o.Name()).Info("stop to run strategy")
+			return
 		case <-ticker.C:
 			slot, err := utils.GetCurSlot(params.Attacker)
 			if err != nil {

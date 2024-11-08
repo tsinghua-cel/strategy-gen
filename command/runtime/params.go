@@ -7,6 +7,7 @@ const (
 	strategyFlag          = "strategy"
 	listFlag              = "list"
 	logFlag               = "log"
+	durationFlag          = "strategy-duration"
 )
 
 type updateParam struct {
@@ -16,6 +17,7 @@ type updateParam struct {
 	strategy          string
 	listLibrary       bool
 	logPath           string
+	duration          int
 }
 
 var (
@@ -25,6 +27,7 @@ var (
 		logPath:           "",
 		maxValidatorIndex: -1,
 		minValidatorIndex: 0,
+		duration:          60,
 		listLibrary:       false,
 	}
 )

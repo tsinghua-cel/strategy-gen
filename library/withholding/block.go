@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/tsinghua-cel/strategy-gen/pointset"
 	"github.com/tsinghua-cel/strategy-gen/types"
-	"github.com/tsinghua-cel/strategy-gen/utils"
 	"strconv"
 )
 
@@ -24,7 +23,7 @@ func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
 	// only use the last subduties
 	subduties := allHacks[len(allHacks)-1]
 
-	duties := subduties.([]utils.ProposerDuty)
+	duties := subduties.([]types.ProposerDuty)
 	end, _ := strconv.Atoi(duties[len(duties)-1].Slot)
 
 	for i := 0; i < len(duties); i++ {

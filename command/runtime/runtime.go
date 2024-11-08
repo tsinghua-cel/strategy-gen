@@ -1,13 +1,16 @@
 package runtime
 
 import (
+	"context"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/tsinghua-cel/strategy-gen/feedback"
 	"github.com/tsinghua-cel/strategy-gen/library"
 	"github.com/tsinghua-cel/strategy-gen/types"
+	"math/rand"
 	"os"
+	"time"
 )
 
 func GetCommand() *cobra.Command {
@@ -84,6 +87,12 @@ func setFlags(cmd *cobra.Command) {
 		false,
 		"list all library strategies",
 	)
+	cmd.Flags().IntVar(
+		&params.duration,
+		durationFlag,
+		60,
+		"duration to run for each strategy when strategy is all",
+	)
 }
 
 func runCommand(cmd *cobra.Command, _ []string) {
@@ -100,22 +109,39 @@ func runCommand(cmd *cobra.Command, _ []string) {
 		listLibrary()
 		return
 	}
+
 	if params.strategy == "" {
 		log.Fatal("strategy is required")
-	}
-
-	strategy, ok := library.GetStrategy(params.strategy)
-	if !ok {
-		log.Fatalf("strategy %s not found", params.strategy)
 	}
 	feedbacker := feedback.NewFeedbacker(params.attacker)
 	feedbacker.Start()
 
-	strategy.Run(types.LibraryParams{
-		Attacker:          params.attacker,
-		MaxValidatorIndex: params.maxValidatorIndex,
-		MinValidatorIndex: params.minValidatorIndex,
-	}, feedbacker)
+	if params.strategy == "all" {
+		strategies := library.GetStrategiesList()
+		for {
+			randIdx := rand.Intn(len(strategies))
+			ctx, cancle := context.WithTimeout(context.Background(), time.Duration(params.duration)*time.Minute)
+			strategy := strategies[randIdx]
+			strategy.Run(ctx, types.LibraryParams{
+				Attacker:          params.attacker,
+				MaxValidatorIndex: params.maxValidatorIndex,
+				MinValidatorIndex: params.minValidatorIndex,
+			}, nil)
+			cancle()
+		}
+	} else {
+		strategy, ok := library.GetStrategy(params.strategy)
+		if !ok {
+			log.Fatalf("strategy %s not found", params.strategy)
+		}
+
+		strategy.Run(context.Background(), types.LibraryParams{
+			Attacker:          params.attacker,
+			MaxValidatorIndex: params.maxValidatorIndex,
+			MinValidatorIndex: params.minValidatorIndex,
+		}, nil)
+	}
+
 }
 
 func listLibrary() {

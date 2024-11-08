@@ -17,7 +17,7 @@ var (
 )
 
 type stageInfo struct {
-	duties  []utils.ProposerDuty
+	duties  []types.ProposerDuty
 	endSlot int64
 }
 
@@ -107,18 +107,17 @@ func BlockStrategy5(idx, cur, end int, actions map[string]string) {
 	}
 }
 
-func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
+func GenSlotStrategy(allHacks []types.ProposerDuty) []types.SlotStrategy {
 	if len(allHacks) == 0 {
 		return nil
 	}
 	strategys := make([]types.SlotStrategy, 0)
-	duties := make([]utils.ProposerDuty, 0)
-	latestDuty := allHacks[len(allHacks)-1].(utils.ProposerDuty)
+	duties := make([]types.ProposerDuty, 0)
+	latestDuty := allHacks[len(allHacks)-1]
 	endSlot, _ := strconv.ParseInt(latestDuty.Slot, 10, 64)
 	epoch := utils.SlotTool{32}.SlotToEpoch(endSlot)
 	lastEpochInfo, haveLast := stageCache.Get(epoch - 1)
-	for i, iduty := range allHacks {
-		duty := iduty.(utils.ProposerDuty)
+	for i, duty := range allHacks {
 		duties = append(duties, duty)
 		slot, _ := strconv.ParseInt(duty.Slot, 10, 64)
 		strategy := types.SlotStrategy{
@@ -130,7 +129,7 @@ func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
 		if i == 0 && haveLast {
 			lastSlot = lastEpochInfo.(stageInfo).endSlot
 		} else if i > 0 {
-			lastSlot, _ = strconv.ParseInt(allHacks[i-1].(utils.ProposerDuty).Slot, 10, 64)
+			lastSlot, _ = strconv.ParseInt(allHacks[i-1].Slot, 10, 64)
 		}
 
 		stage := rand.Intn(4) + 1

@@ -1,6 +1,7 @@
 package staircase
 
 import (
+	"context"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/tsinghua-cel/strategy-gen/types"
@@ -21,13 +22,16 @@ func (o *Instance) Description() string {
 	return desc_eng
 }
 
-func (o *Instance) Run(params types.LibraryParams, feedbacker types.FeedBacker) {
+func (o *Instance) Run(ctx context.Context, params types.LibraryParams, feedbacker types.FeedBacker) {
 	log.WithField("name", o.Name()).Info("start to run strategy")
 	var latestEpoch int64 = -1
 	ticker := time.NewTicker(time.Second * 3)
 	slotTool := utils.SlotTool{SlotsPerEpoch: 32}
 	for {
 		select {
+		case <-ctx.Done():
+			log.WithField("name", o.Name()).Info("stop to run strategy")
+			return
 		case <-ticker.C:
 			slot, err := utils.GetCurSlot(params.Attacker)
 			if err != nil {
@@ -87,7 +91,7 @@ func (o *Instance) Run(params types.LibraryParams, feedbacker types.FeedBacker) 
 					cas = 1
 				}
 				strategy.Uid = uuid.NewString()
-				strategy.Slots = GenSlotStrategy(getLatestHackerSlot(nextDuties, params), nextEpoch, cas)
+				strategy.Slots = GenSlotStrategy(params.FillterHackDuties(nextDuties), cas)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
 					log.WithField("error", err).Error("failed to update strategy")
 				} else {
@@ -101,7 +105,7 @@ func (o *Instance) Run(params types.LibraryParams, feedbacker types.FeedBacker) 
 	}
 }
 
-func getLatestHackerSlot(duties []utils.ProposerDuty, param types.LibraryParams) int {
+func getLatestHackerSlot(duties []types.ProposerDuty, param types.LibraryParams) int {
 	latest, _ := strconv.Atoi(duties[0].Slot)
 	for _, duty := range duties {
 		idx, _ := strconv.Atoi(duty.ValidatorIndex)
@@ -117,7 +121,7 @@ func getLatestHackerSlot(duties []utils.ProposerDuty, param types.LibraryParams)
 
 }
 
-func checkFirstByzSlot(duties []utils.ProposerDuty, param types.LibraryParams) bool {
+func checkFirstByzSlot(duties []types.ProposerDuty, param types.LibraryParams) bool {
 	firstproposerindex, _ := strconv.Atoi(duties[0].ValidatorIndex)
 	if !types.IsHackValidator(firstproposerindex, param) {
 		return false

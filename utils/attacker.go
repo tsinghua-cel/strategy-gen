@@ -112,13 +112,7 @@ func GetEpoch(url string) (int, error) {
 	return epoch, nil
 }
 
-type ProposerDuty struct {
-	Pubkey         string `json:"pubkey"`
-	ValidatorIndex string `json:"validator_index"`
-	Slot           string `json:"slot"`
-}
-
-func GetEpochDuties(url string, epoch int64) ([]ProposerDuty, error) {
+func GetEpochDuties(url string, epoch int64) ([]types.ProposerDuty, error) {
 	res, err := hclient.Get(fmt.Sprintf("http://%s/v1/duties/%d", url, epoch))
 	if err != nil {
 		return nil, err
@@ -127,7 +121,7 @@ func GetEpochDuties(url string, epoch int64) ([]ProposerDuty, error) {
 		return nil, fmt.Errorf("failed to get duties: %s", res.Status)
 	}
 
-	var duties []ProposerDuty
+	var duties []types.ProposerDuty
 	err = json.NewDecoder(res.Body).Decode(&duties)
 	if err != nil {
 		return nil, err

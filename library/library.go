@@ -1,6 +1,7 @@
 package library
 
 import (
+	"context"
 	aiattack "github.com/tsinghua-cel/strategy-gen/library/ai"
 	"github.com/tsinghua-cel/strategy-gen/library/confuse"
 	"github.com/tsinghua-cel/strategy-gen/library/exante"
@@ -20,7 +21,7 @@ import (
 
 type Strategy interface {
 	Name() string
-	Run(param types.LibraryParams, feedbacker types.FeedBacker)
+	Run(ctx context.Context, param types.LibraryParams, feedbacker types.FeedBacker)
 	Description() string
 }
 
@@ -59,6 +60,14 @@ func GetAllStrategies() map[string]Strategy {
 	strategies := make(map[string]Strategy)
 	allStrategies.Range(func(k, v interface{}) bool {
 		strategies[k.(string)] = v.(Strategy)
+		return true
+	})
+	return strategies
+}
+func GetStrategiesList() []Strategy {
+	strategies := make([]Strategy, 0)
+	allStrategies.Range(func(k, v interface{}) bool {
+		strategies = append(strategies, v.(Strategy))
 		return true
 	})
 	return strategies

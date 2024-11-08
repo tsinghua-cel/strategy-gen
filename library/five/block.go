@@ -3,7 +3,6 @@ package five
 import (
 	"fmt"
 	"github.com/tsinghua-cel/strategy-gen/types"
-	"github.com/tsinghua-cel/strategy-gen/utils"
 )
 
 /*
@@ -15,7 +14,7 @@ delay 策略：第一个恶意节点的区块，广播delay 1个slot;
 func GenSlotStrategy(duties []interface{}) []types.SlotStrategy {
 	strategys := make([]types.SlotStrategy, 0)
 	for i := 0; i < len(duties); i++ {
-		duty := duties[i].([]utils.ProposerDuty)
+		duty := duties[i].([]types.ProposerDuty)
 		if len(duty) != 3 {
 			continue
 		}
