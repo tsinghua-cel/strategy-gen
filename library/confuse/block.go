@@ -3,6 +3,7 @@ package confuse
 import (
 	"fmt"
 	lru "github.com/hashicorp/golang-lru"
+	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/pointset"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"github.com/tsinghua-cel/strategy-gen/utils"
@@ -11,9 +12,8 @@ import (
 )
 
 var (
-	SecondsPerSlot = 12
-	epochPerStage  = int64(8) // every 8 epoch is a stage, to change strategy.
-	stageCache, _  = lru.New(100)
+	epochPerStage = int64(8) // every 8 epoch is a stage, to change strategy.
+	stageCache, _ = lru.New(100)
 )
 
 type stageInfo struct {
@@ -33,7 +33,7 @@ func BlockStrategy(idx, cur, end int, actions map[string]string) {
 		// propose block, and pack all pooled attest.
 		// modify parent to last epoch endslot.
 		actions["BlockBeforeSign"] = "packPooledAttest"
-		lastEpoch := utils.SlotTool{32}.SlotToEpoch(int64(end)) - 1
+		lastEpoch := utils.SlotTool{globalinfo.ChainBaseInfo().SlotsPerEpoch}.SlotToEpoch(int64(end)) - 1
 		if data, exist := stageCache.Get(lastEpoch); exist {
 			info := data.(stageInfo)
 			actions["BlockGetNewParentRoot"] = fmt.Sprintf("modifyParentRoot:%d", info.endSlot)
@@ -47,7 +47,7 @@ func BlockStrategy2(idx, cur, end int, actions map[string]string) {
 
 	if cur != end {
 		// block broadcast delay to end slot.
-		delay := (end-cur)*SecondsPerSlot + idx + 1
+		delay := (end-cur)*globalinfo.ChainBaseInfo().SecondsPerSlot + idx + 1
 		actions["BlockBeforeBroadCast"] = fmt.Sprintf("delayWithSecond:%d", delay)
 		// attest broadcast delay to end slot.
 		actions["AttestBeforeBroadCast"] = fmt.Sprintf("delayWithSecond:%d", delay)
@@ -71,7 +71,7 @@ func BlockStrategy4(idx, cur, end int, actions map[string]string) {
 	attestpoint := attestPoints[rand.Intn(len(attestPoints))]
 	actions[blockpoint] = fmt.Sprintf("delayWithSecond:%d", rand.Intn(80)+10)
 	actions[attestpoint] = fmt.Sprintf("delayWithSecond:%d", rand.Intn(80)+10)
-	lastEpoch := utils.SlotTool{32}.SlotToEpoch(int64(end)) - 1
+	lastEpoch := utils.SlotTool{globalinfo.ChainBaseInfo().SlotsPerEpoch}.SlotToEpoch(int64(end)) - 1
 	if data, exist := stageCache.Get(lastEpoch); exist {
 		info := data.(stageInfo)
 		actions["BlockGetNewParentRoot"] = fmt.Sprintf("modifyParentRoot:%d", rand.Intn(int(info.endSlot))+1)
@@ -99,11 +99,11 @@ func BlockStrategy5(idx, cur, end int, actions map[string]string) {
 		used[blockpoint] = true
 		used[attestpoint] = true
 	}
-	lastEpoch := utils.SlotTool{32}.SlotToEpoch(int64(end)) - 1
+	lastEpoch := utils.SlotTool{globalinfo.ChainBaseInfo().SlotsPerEpoch}.SlotToEpoch(int64(end)) - 1
 	if data, exist := stageCache.Get(lastEpoch); exist {
 		info := data.(stageInfo)
 		actions["BlockGetNewParentRoot"] = fmt.Sprintf("modifyParentRoot:%d",
-			rand.Intn(cur-int(info.endSlot))+int(info.endSlot)-32)
+			rand.Intn(cur-int(info.endSlot))+int(info.endSlot)-globalinfo.ChainBaseInfo().SlotsPerEpoch)
 	}
 }
 
@@ -115,7 +115,7 @@ func GenSlotStrategy(allHacks []types.ProposerDuty) []types.SlotStrategy {
 	duties := make([]types.ProposerDuty, 0)
 	latestDuty := allHacks[len(allHacks)-1]
 	endSlot, _ := strconv.ParseInt(latestDuty.Slot, 10, 64)
-	epoch := utils.SlotTool{32}.SlotToEpoch(endSlot)
+	epoch := utils.SlotTool{globalinfo.ChainBaseInfo().SlotsPerEpoch}.SlotToEpoch(endSlot)
 	lastEpochInfo, haveLast := stageCache.Get(epoch - 1)
 	for i, duty := range allHacks {
 		duties = append(duties, duty)

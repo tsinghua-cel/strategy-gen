@@ -29,9 +29,8 @@ const (
 )
 
 var (
-	SecondsPerSlot = 12
-	stageCache, _  = lru.New(100)
-	allPoints      = []ActionPoint{
+	stageCache, _ = lru.New(100)
+	allPoints     = []ActionPoint{
 		AttestBeforeBroadCast,
 		AttestAfterBroadCast,
 		AttestBeforeSign,

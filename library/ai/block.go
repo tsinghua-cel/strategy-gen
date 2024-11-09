@@ -14,10 +14,9 @@ import (
 )
 
 var (
-	SecondsPerSlot = 12
-	prompt         = ""
-	agent          *ai.Session
-	initonce       = sync.Once{}
+	prompt   = ""
+	agent    *ai.Session
+	initonce = sync.Once{}
 )
 
 func initAgent() {

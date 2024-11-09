@@ -2,6 +2,7 @@ package three
 
 import (
 	"fmt"
+	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/types"
 )
 
@@ -11,6 +12,8 @@ func getSlotStrategy(epoch int64, slot string, isLatestHackDuty bool) types.Slot
 		Level:   0,
 		Actions: make(map[string]string),
 	}
+	secondsPerSlot := globalinfo.ChainBaseInfo().SecondsPerSlot
+	slotsPerEpoch := globalinfo.ChainBaseInfo().SlotsPerEpoch
 	switch epoch % 3 {
 	case 0, 1:
 		strategy.Actions["BlockBeforeSign"] = "return"
@@ -25,8 +28,8 @@ func getSlotStrategy(epoch int64, slot string, isLatestHackDuty bool) types.Slot
 			// delay half epoch first.
 			strategy.Actions["BlockDelayForReceiveBlock"] = fmt.Sprintf("delayHalfEpoch")
 			// and then delay 1.5 epoch and 1 slot.
-			totalSlots := 32/2*3 + 1
-			totalSeconds := 12 * totalSlots
+			totalSlots := slotsPerEpoch*3/2 + 1
+			totalSeconds := secondsPerSlot * totalSlots
 			strategy.Actions["BlockBeforeBroadCast"] = fmt.Sprintf("delayWithSecond:%d", totalSeconds)
 
 		} else {

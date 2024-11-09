@@ -2,6 +2,7 @@ package one
 
 import (
 	"fmt"
+	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/pointset"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"strconv"
@@ -14,13 +15,15 @@ delay策略：blockdelay 到最后一个恶意节点出块的下一个slot；
 恶意节点的投票者 开始做恶，对投票进行delay，执行的策略和blockdelay一样。
 */
 func BlockStrategy(cur, end int, actions map[string]string) {
+	secondPerSlot := globalinfo.ChainBaseInfo().SecondsPerSlot
 	point := pointset.GetPointByName("BlockBeforeBroadCast")
-	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", (end+1-cur)*12)
+	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", (end+1-cur)*secondPerSlot)
 }
 
 func AttestStrategy(cur, end int, actions map[string]string) {
+	secondPerSlot := globalinfo.ChainBaseInfo().SecondsPerSlot
 	point := pointset.GetPointByName("AttestBeforeBroadCast")
-	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", (end+1-cur)*12)
+	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", (end+1-cur)*secondPerSlot)
 }
 
 func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {

@@ -2,6 +2,7 @@ package staircase
 
 import (
 	"fmt"
+	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"strconv"
 )
@@ -16,6 +17,8 @@ func getSlotStrategy(slot string, cas int, isLatestHackSlot bool) types.SlotStra
 		Level:   0,
 		Actions: make(map[string]string),
 	}
+	secondsPerSlot := globalinfo.ChainBaseInfo().SecondsPerSlot
+	slotsPerEpoch := globalinfo.ChainBaseInfo().SlotsPerEpoch
 	switch cas {
 	case 0:
 		strategy.Actions["BlockBeforeSign"] = "return"
@@ -24,8 +27,8 @@ func getSlotStrategy(slot string, cas int, isLatestHackSlot bool) types.SlotStra
 	case 1:
 		if isLatestHackSlot {
 			islot, _ := strconv.Atoi(slot)
-			stageI := (32 - islot%32) * 12
-			stageII := 12 * 12
+			stageI := (slotsPerEpoch - islot%slotsPerEpoch) * secondsPerSlot
+			stageII := 12 * secondsPerSlot
 
 			strategy.Actions["AttestBeforeSign"] = fmt.Sprintf("return")
 

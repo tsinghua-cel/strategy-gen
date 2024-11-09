@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
+	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"github.com/tsinghua-cel/strategy-gen/utils"
 	"time"
@@ -31,7 +32,7 @@ func (o *Instance) Run(ctx context.Context, params types.LibraryParams, feedback
 	log.WithField("name", o.Name()).Info("start to run strategy")
 	var latestEpoch int64
 	ticker := time.NewTicker(time.Second * 3)
-	slotTool := utils.SlotTool{SlotsPerEpoch: 32}
+	slotTool := utils.SlotTool{SlotsPerEpoch: globalinfo.ChainBaseInfo().SlotsPerEpoch}
 	for {
 		select {
 		case <-ctx.Done():

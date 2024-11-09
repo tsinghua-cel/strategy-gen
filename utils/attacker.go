@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"net"
 	"net/http"
@@ -63,6 +64,23 @@ func GetStrategyFeedback(url string, uid string) (types.FeedBackInfo, error) {
 	}
 	// do something with feedback
 	return feedback, nil
+}
+
+func GetChainBaseInfo(url string) (globalinfo.ChainBaseConfig, error) {
+	res, err := hclient.Get(fmt.Sprintf("http://%s/v1/chain-base-info", url))
+	if err != nil {
+		return globalinfo.ChainBaseInfo(), err
+	}
+	if res.StatusCode != 200 {
+		return globalinfo.ChainBaseInfo(), fmt.Errorf("failed to get second per slot: %s", res.Status)
+	}
+
+	var chainBaseInfo globalinfo.ChainBaseConfig
+	err = json.NewDecoder(res.Body).Decode(&chainBaseInfo)
+	if err != nil {
+		return globalinfo.ChainBaseInfo(), err
+	}
+	return chainBaseInfo, nil
 }
 
 func GetCurSlot(url string) (int, error) {

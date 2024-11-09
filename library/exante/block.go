@@ -2,18 +2,15 @@ package exante
 
 import (
 	"fmt"
+	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/pointset"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"strconv"
 )
 
-var (
-	SecondsPerSlot = 12
-)
-
 func BlockStrategy(cur, end int, actions map[string]string) {
 	point := pointset.GetPointByName("BlockBeforeBroadCast")
-	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", (end+1-cur)*SecondsPerSlot)
+	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", (end+1-cur)*globalinfo.ChainBaseInfo().SecondsPerSlot)
 }
 
 func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {

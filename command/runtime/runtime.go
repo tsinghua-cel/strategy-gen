@@ -6,8 +6,10 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/tsinghua-cel/strategy-gen/feedback"
+	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/library"
 	"github.com/tsinghua-cel/strategy-gen/types"
+	"github.com/tsinghua-cel/strategy-gen/utils"
 	"math/rand"
 	"os"
 	"time"
@@ -116,6 +118,22 @@ func runCommand(cmd *cobra.Command, _ []string) {
 	feedbacker := feedback.NewFeedbacker(params.attacker)
 	feedbacker.Start()
 
+	// get second per slot
+	initFinished := false
+	for !initFinished {
+		base, err := utils.GetChainBaseInfo(params.attacker)
+		if err != nil {
+			log.WithError(err).Error("failed to get second per slot")
+			time.Sleep(1 * time.Second)
+			continue
+		} else {
+			log.Infof("get chain base info %s", base)
+			initFinished = true
+			globalinfo.Init(base)
+		}
+	}
+	log.Info("init finished")
+
 	if params.strategy == "all" {
 		strategies := library.GetStrategiesList()
 		for {
@@ -141,7 +159,6 @@ func runCommand(cmd *cobra.Command, _ []string) {
 			MinValidatorIndex: params.minValidatorIndex,
 		}, nil)
 	}
-
 }
 
 func listLibrary() {

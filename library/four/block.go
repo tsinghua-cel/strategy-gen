@@ -2,6 +2,7 @@ package four
 
 import (
 	"fmt"
+	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"strconv"
 )
@@ -12,6 +13,8 @@ func getSlotStrategy(epoch int64, slot string, isLatestHackDuty bool) types.Slot
 		Level:   0,
 		Actions: make(map[string]string),
 	}
+	secondPerSlot := globalinfo.ChainBaseInfo().SecondsPerSlot
+	slotsPerEpoch := globalinfo.ChainBaseInfo().SlotsPerEpoch
 	switch epoch % 3 {
 	case 0, 1:
 		strategy.Actions["BlockBeforeSign"] = "return"
@@ -22,8 +25,8 @@ func getSlotStrategy(epoch int64, slot string, isLatestHackDuty bool) types.Slot
 		if isLatestHackDuty {
 			strategy.Level = 1
 			islot, _ := strconv.Atoi(slot)
-			stageI := (32 - islot%32) * 12
-			stageII := 12 * 12
+			stageI := (slotsPerEpoch - islot%slotsPerEpoch) * secondPerSlot
+			stageII := 12 * secondPerSlot
 
 			strategy.Actions["AttestBeforeSign"] = fmt.Sprintf("return")
 

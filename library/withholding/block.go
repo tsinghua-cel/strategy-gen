@@ -2,16 +2,19 @@ package withholding
 
 import (
 	"fmt"
+	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/pointset"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"strconv"
 )
 
 func BlockStrategy(cur, end int, actions map[string]string) {
+	slotsPerEpoch := globalinfo.ChainBaseInfo().SlotsPerEpoch
+	secondsPerSlot := globalinfo.ChainBaseInfo().SecondsPerSlot
 	endStage := end + 1 - cur
-	endStage += 32 / 2 // add half epoch.
+	endStage += slotsPerEpoch / 2 // add half epoch.
 	point := pointset.GetPointByName("BlockBeforeBroadCast")
-	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", endStage*12)
+	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", endStage*secondsPerSlot)
 }
 
 func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
