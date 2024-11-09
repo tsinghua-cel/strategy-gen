@@ -31,6 +31,7 @@ func (o *Instance) Run(ctx context.Context, params types.LibraryParams, feedback
 		select {
 		case <-ctx.Done():
 			log.WithField("name", o.Name()).Info("stop to run strategy")
+			return
 		case <-ticker.C:
 			slot, err := utils.GetCurSlot(params.Attacker)
 			if err != nil {
