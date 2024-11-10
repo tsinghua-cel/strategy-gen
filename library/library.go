@@ -2,9 +2,13 @@ package library
 
 import (
 	"context"
-	aiattack "github.com/tsinghua-cel/strategy-gen/library/ai"
 	"github.com/tsinghua-cel/strategy-gen/library/confuse"
 	"github.com/tsinghua-cel/strategy-gen/library/exante"
+	"github.com/tsinghua-cel/strategy-gen/library/ext_exante"
+	"github.com/tsinghua-cel/strategy-gen/library/ext_sandwich"
+	"github.com/tsinghua-cel/strategy-gen/library/ext_staircase"
+	"github.com/tsinghua-cel/strategy-gen/library/ext_unrealized"
+	"github.com/tsinghua-cel/strategy-gen/library/ext_withholding"
 	"github.com/tsinghua-cel/strategy-gen/library/five"
 	"github.com/tsinghua-cel/strategy-gen/library/four"
 	"github.com/tsinghua-cel/strategy-gen/library/one"
@@ -41,8 +45,15 @@ func Init() {
 	register(&unrealized.Instance{})
 	register(&staircase.Instance{})
 	register(&confuse.Instance{})
-	register(&aiattack.Instance{})
+	//register(&aiattack.Instance{})
 	register(&randomdelay.Instance{})
+
+	register(&ext_sandwich.Instance{})
+	register(&ext_exante.Instance{})
+	register(&ext_staircase.Instance{})
+	register(&ext_unrealized.Instance{})
+	register(&ext_withholding.Instance{})
+
 }
 
 func register(ins Strategy) {
