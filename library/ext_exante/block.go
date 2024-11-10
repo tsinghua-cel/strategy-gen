@@ -5,6 +5,8 @@ import (
 	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/pointset"
 	"github.com/tsinghua-cel/strategy-gen/types"
+	"github.com/tsinghua-cel/strategy-gen/utils"
+	"math/rand"
 	"strconv"
 )
 
@@ -13,7 +15,7 @@ func BlockStrategy(cur, end int, actions map[string]string) {
 	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", (end+1-cur)*globalinfo.ChainBaseInfo().SecondsPerSlot)
 }
 
-func GenSlotStrategy(allHacks []interface{}, allHackDuties []types.ProposerDuty) []types.SlotStrategy {
+func GenSlotStrategy(allHacks []interface{}, fullHackDuties []types.ProposerDuty) []types.SlotStrategy {
 	fullDuties := make(map[string]bool)
 	strategys := make([]types.SlotStrategy, 0)
 	for _, subduties := range allHacks {
@@ -32,6 +34,20 @@ func GenSlotStrategy(allHacks []interface{}, allHackDuties []types.ProposerDuty)
 			strategys = append(strategys, strategy)
 			fullDuties[duties[i].Slot] = true
 		}
+	}
+	// add some random strategy.
+	for _, duty := range fullHackDuties {
+		if _, ok := fullDuties[duty.Slot]; ok {
+			continue
+		}
+		slot, _ := strconv.Atoi(duty.Slot)
+		strategy := types.SlotStrategy{
+			Slot:    duty.Slot,
+			Level:   1,
+			Actions: make(map[string]string),
+		}
+		strategy.Actions = utils.GetRandomActions(slot, rand.Intn(4))
+		strategys = append(strategys, strategy)
 	}
 
 	return strategys

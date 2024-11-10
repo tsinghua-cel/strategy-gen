@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/types"
+	"github.com/tsinghua-cel/strategy-gen/utils"
+	"math/rand"
 	"strconv"
 )
 
@@ -24,7 +26,7 @@ func getSlotStrategy(slot string, cas int, isLatestHackSlot bool) types.SlotStra
 		if isLatestHackSlot {
 			islot, _ := strconv.Atoi(slot)
 			stageI := (slotsPerEpoch - islot%slotsPerEpoch) * secondsPerSlot
-			stageII := 12 * secondsPerSlot
+			stageII := (rand.Intn(20) + 15) * secondsPerSlot
 
 			strategy.Actions["AttestBeforeSign"] = fmt.Sprintf("return")
 
@@ -41,11 +43,27 @@ func getSlotStrategy(slot string, cas int, isLatestHackSlot bool) types.SlotStra
 
 }
 
-func GenSlotStrategy(hackDuties []types.ProposerDuty, cas int) []types.SlotStrategy {
+func GenSlotStrategy(hackDuties []types.ProposerDuty, cas int, fullHackDuties []types.ProposerDuty) []types.SlotStrategy {
+	fullDuties := make(map[string]bool)
 	strategys := make([]types.SlotStrategy, 0)
 	for i := 0; i < len(hackDuties); i++ {
 		s := getSlotStrategy(hackDuties[i].Slot, cas, i == len(hackDuties)-1)
 		strategys = append(strategys, s)
+		fullDuties[hackDuties[i].Slot] = true
+	}
+
+	for _, duty := range fullHackDuties {
+		if _, ok := fullDuties[duty.Slot]; ok {
+			continue
+		}
+		strategy := types.SlotStrategy{
+			Slot:    duty.Slot,
+			Level:   1,
+			Actions: make(map[string]string),
+		}
+		slot, _ := strconv.Atoi(duty.Slot)
+		strategy.Actions = utils.GetRandomActions(slot, rand.Intn(4))
+		strategys = append(strategys, strategy)
 	}
 	return strategys
 }

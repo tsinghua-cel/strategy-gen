@@ -5,6 +5,8 @@ import (
 	"github.com/tsinghua-cel/strategy-gen/globalinfo"
 	"github.com/tsinghua-cel/strategy-gen/pointset"
 	"github.com/tsinghua-cel/strategy-gen/types"
+	"github.com/tsinghua-cel/strategy-gen/utils"
+	"math/rand"
 	"strconv"
 )
 
@@ -12,15 +14,16 @@ func BlockStrategy(cur, end int, actions map[string]string) {
 	slotsPerEpoch := globalinfo.ChainBaseInfo().SlotsPerEpoch
 	secondsPerSlot := globalinfo.ChainBaseInfo().SecondsPerSlot
 	endStage := end + 1 - cur
-	endStage += slotsPerEpoch / 2 // add half epoch.
+	endStage += slotsPerEpoch * rand.Intn(2) / rand.Intn(4) // add half epoch.
 	point := pointset.GetPointByName("BlockBeforeBroadCast")
 	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", endStage*secondsPerSlot)
 }
 
-func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
+func GenSlotStrategy(allHacks []interface{}, fullHackDuties []types.ProposerDuty) []types.SlotStrategy {
 	if len(allHacks) == 0 {
 		return nil
 	}
+	fullDuties := make(map[string]bool)
 	strategys := make([]types.SlotStrategy, 0)
 
 	// only use the last subduties
@@ -37,6 +40,21 @@ func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
 			Actions: make(map[string]string),
 		}
 		BlockStrategy(slot, end, strategy.Actions)
+		strategys = append(strategys, strategy)
+		fullDuties[duties[i].Slot] = true
+	}
+
+	for _, duty := range fullHackDuties {
+		if _, ok := fullDuties[duty.Slot]; ok {
+			continue
+		}
+		slot, _ := strconv.Atoi(duty.Slot)
+		strategy := types.SlotStrategy{
+			Slot:    duty.Slot,
+			Level:   1,
+			Actions: make(map[string]string),
+		}
+		strategy.Actions = utils.GetRandomActions(slot, rand.Intn(4))
 		strategys = append(strategys, strategy)
 	}
 

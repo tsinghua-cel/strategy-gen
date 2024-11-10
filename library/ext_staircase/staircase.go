@@ -93,7 +93,7 @@ func (o *Instance) Run(ctx context.Context, params types.LibraryParams, feedback
 					cas = 1
 				}
 
-				strategy.Slots = GenSlotStrategy(params.FillterHackDuties(nextDuties), cas)
+				strategy.Slots = GenSlotStrategy(params.FillterHackDuties(nextDuties), cas, params.FillterHackDuties(nextDuties))
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
 					log.WithField("error", err).Error("failed to update strategy")
 				} else {
