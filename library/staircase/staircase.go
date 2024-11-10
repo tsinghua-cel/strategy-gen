@@ -85,7 +85,6 @@ func (o *Instance) Run(ctx context.Context, params types.LibraryParams, feedback
 					continue
 				}
 				strategy := types.Strategy{}
-				strategy.Validators = ValidatorStrategy(params, nextEpoch)
 				if checkFirstByzSlot(preDuties, params) &&
 					checkFirstByzSlot(curDuties, params) &&
 					!checkFirstByzSlot(nextDuties, params) {

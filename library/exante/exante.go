@@ -63,7 +63,6 @@ func (o *Instance) Run(ctx context.Context, params types.LibraryParams, feedback
 			if hackDuties, happen := CheckDuties(params, duties); happen {
 				strategy := types.Strategy{}
 				strategy.Uid = uuid.NewString()
-				strategy.Validators = ValidatorStrategy(hackDuties)
 				strategy.Slots = GenSlotStrategy(hackDuties)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
 					log.WithField("error", err).Error("failed to update strategy")

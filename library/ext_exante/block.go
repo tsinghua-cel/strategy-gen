@@ -13,7 +13,8 @@ func BlockStrategy(cur, end int, actions map[string]string) {
 	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", (end+1-cur)*globalinfo.ChainBaseInfo().SecondsPerSlot)
 }
 
-func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
+func GenSlotStrategy(allHacks []interface{}, allHackDuties []types.ProposerDuty) []types.SlotStrategy {
+	fullDuties := make(map[string]bool)
 	strategys := make([]types.SlotStrategy, 0)
 	for _, subduties := range allHacks {
 		duties := subduties.([]types.ProposerDuty)
@@ -29,6 +30,7 @@ func GenSlotStrategy(allHacks []interface{}) []types.SlotStrategy {
 			}
 			BlockStrategy(slot, end, strategy.Actions)
 			strategys = append(strategys, strategy)
+			fullDuties[duties[i].Slot] = true
 		}
 	}
 

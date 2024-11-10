@@ -75,7 +75,6 @@ func (o *Instance) Run(ctx context.Context, params types.LibraryParams, feedback
 				}
 				strategy := types.Strategy{}
 				strategy.Uid = uuid.NewString()
-				strategy.Validators = ValidatorStrategy(params, nextEpoch)
 				strategy.Slots = GenSlotStrategy(params.FillterHackDuties(duties), nextEpoch)
 				if err = utils.UpdateStrategy(params.Attacker, strategy); err != nil {
 					log.WithField("error", err).Error("failed to update strategy")
