@@ -18,11 +18,11 @@ type Instance struct {
 }
 
 func (o *Instance) Name() string {
-	return "randomdelay"
+	return "random"
 }
 
 func (o *Instance) Description() string {
-	desc_eng := `delay random time (10~40) in random point.`
+	desc_eng := `generate random actions.`
 	return desc_eng
 }
 
@@ -106,7 +106,7 @@ func (o *Instance) Run(ctx context.Context, params types.LibraryParams, feedback
 				} else {
 					log.WithFields(log.Fields{
 						"epoch":    epoch + 1,
-						"strategy": strategy,
+						"strategy": strategy.Uid,
 					}).Info("update strategy successfully")
 					if feedbacker != nil {
 						o.mux.Lock()
