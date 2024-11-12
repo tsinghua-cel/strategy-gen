@@ -6,7 +6,6 @@ import (
 	"github.com/tsinghua-cel/strategy-gen/pointset"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"github.com/tsinghua-cel/strategy-gen/utils"
-	"math/rand"
 	"strconv"
 )
 
@@ -46,7 +45,7 @@ func GenSlotStrategy(allHacks []interface{}, fullHackDuties []types.ProposerDuty
 			Level:   1,
 			Actions: make(map[string]string),
 		}
-		strategy.Actions = utils.GetRandomActions(slot, rand.Intn(4))
+		strategy.Actions = utils.GetRandomActions(slot, utils.SafeRand(4))
 		strategys = append(strategys, strategy)
 	}
 

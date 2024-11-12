@@ -1,4 +1,4 @@
-package four
+package syncwrong
 
 import (
 	"context"
@@ -14,7 +14,7 @@ type Instance struct {
 }
 
 func (o *Instance) Name() string {
-	return "four"
+	return "syncwrong"
 }
 
 func (o *Instance) Description() string {

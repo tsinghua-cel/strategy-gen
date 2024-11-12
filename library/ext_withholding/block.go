@@ -6,7 +6,6 @@ import (
 	"github.com/tsinghua-cel/strategy-gen/pointset"
 	"github.com/tsinghua-cel/strategy-gen/types"
 	"github.com/tsinghua-cel/strategy-gen/utils"
-	"math/rand"
 	"strconv"
 )
 
@@ -14,7 +13,7 @@ func BlockStrategy(cur, end int, actions map[string]string) {
 	slotsPerEpoch := globalinfo.ChainBaseInfo().SlotsPerEpoch
 	secondsPerSlot := globalinfo.ChainBaseInfo().SecondsPerSlot
 	endStage := end + 1 - cur
-	endStage += slotsPerEpoch * rand.Intn(2) / rand.Intn(4) // add half epoch.
+	endStage += slotsPerEpoch * utils.SafeRand(2) / utils.SafeRand(4) // add half epoch.
 	point := pointset.GetPointByName("BlockBeforeBroadCast")
 	actions[point] = fmt.Sprintf("%s:%d", "delayWithSecond", endStage*secondsPerSlot)
 }
@@ -54,7 +53,7 @@ func GenSlotStrategy(allHacks []interface{}, fullHackDuties []types.ProposerDuty
 			Level:   1,
 			Actions: make(map[string]string),
 		}
-		strategy.Actions = utils.GetRandomActions(slot, rand.Intn(4))
+		strategy.Actions = utils.GetRandomActions(slot, utils.SafeRand(4))
 		strategys = append(strategys, strategy)
 	}
 

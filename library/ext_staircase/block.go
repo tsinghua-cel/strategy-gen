@@ -62,7 +62,7 @@ func GenSlotStrategy(hackDuties []types.ProposerDuty, cas int, fullHackDuties []
 			Actions: make(map[string]string),
 		}
 		slot, _ := strconv.Atoi(duty.Slot)
-		strategy.Actions = utils.GetRandomActions(slot, rand.Intn(4))
+		strategy.Actions = utils.GetRandomActions(slot, utils.SafeRand(4))
 		strategys = append(strategys, strategy)
 	}
 	return strategys

@@ -1,4 +1,4 @@
-package four
+package syncwrong
 
 import (
 	"fmt"

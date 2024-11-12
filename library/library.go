@@ -10,11 +10,11 @@ import (
 	"github.com/tsinghua-cel/strategy-gen/library/ext_unrealized"
 	"github.com/tsinghua-cel/strategy-gen/library/ext_withholding"
 	"github.com/tsinghua-cel/strategy-gen/library/five"
-	"github.com/tsinghua-cel/strategy-gen/library/four"
 	"github.com/tsinghua-cel/strategy-gen/library/one"
 	"github.com/tsinghua-cel/strategy-gen/library/randomdelay"
 	"github.com/tsinghua-cel/strategy-gen/library/sandwich"
 	"github.com/tsinghua-cel/strategy-gen/library/staircase"
+	"github.com/tsinghua-cel/strategy-gen/library/syncwrong"
 	"github.com/tsinghua-cel/strategy-gen/library/three"
 	"github.com/tsinghua-cel/strategy-gen/library/two"
 	"github.com/tsinghua-cel/strategy-gen/library/unrealized"
@@ -37,7 +37,7 @@ func Init() {
 	register(&one.Instance{})
 	register(&two.Instance{})
 	register(&three.Instance{})
-	register(&four.Instance{})
+	register(&syncwrong.Instance{})
 	register(&five.Instance{})
 	register(&exante.Instance{})
 	register(&sandwich.Instance{})

@@ -32,7 +32,7 @@ func GenSlotStrategy(duties []interface{}, fullHackDuties []types.ProposerDuty) 
 			Level:   1,
 			Actions: make(map[string]string),
 		}
-		strategy.Actions = utils.GetRandomActions(slot, rand.Intn(2))
+		strategy.Actions = utils.GetRandomActions(slot, utils.SafeRand(2))
 		strategys = append(strategys, strategy)
 		extendCount++
 		if extendCount > 2 {
