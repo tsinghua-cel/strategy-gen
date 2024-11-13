@@ -42,7 +42,7 @@ func (o *Instance) Run(ctx context.Context, params types.LibraryParams, feedback
 			if epoch == latestEpoch {
 				continue
 			}
-			if int64(slot) < slotTool.EpochEnd(epoch) {
+			if (int64(slot) + 5) < slotTool.EpochEnd(epoch) {
 				continue
 			}
 			latestEpoch = epoch
