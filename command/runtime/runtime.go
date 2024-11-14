@@ -12,6 +12,7 @@ import (
 	"github.com/tsinghua-cel/strategy-gen/utils"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -133,13 +134,28 @@ func runCommand(cmd *cobra.Command, _ []string) {
 		}
 	}
 	log.Info("init finished")
+	filters := make(map[string]bool)
+	if splits := strings.Split(params.strategy, ","); len(splits) > 1 {
+		for _, split := range splits {
+			filters[split] = true
+		}
+	}
 
-	if params.strategy == "all" {
+	if params.strategy == "all" || len(filters) > 0 {
 		strategies := library.GetStrategiesList()
+		filtered := make([]library.Strategy, 0)
+		for _, strategy := range strategies {
+			if _, exist := filters[strategy.Name()]; exist || len(filters) == 0 {
+				filtered = append(filtered, strategy)
+			}
+		}
+		log.WithFields(log.Fields{
+			"filtered": filtered,
+		}).Info("start to run filtered strategies")
 		for {
-			randIdx := rand.Intn(len(strategies))
+			randIdx := rand.Intn(len(filtered))
 			ctx, cancle := context.WithTimeout(context.Background(), time.Duration(params.duration)*time.Minute)
-			strategy := strategies[randIdx]
+			strategy := filtered[randIdx]
 			strategy.Run(ctx, types.LibraryParams{
 				Attacker:          params.attacker,
 				MaxValidatorIndex: params.maxValidatorIndex,
